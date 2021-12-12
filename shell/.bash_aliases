@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Python
-#alias python='python3.6'
-#alias python3='python3.6'
+alias python3='python3.8'
+alias python=python3
 
 # Environment Control
-alias venv='virtualenv -p python3 .env'
+alias venv='python3 -m venv .env'
 alias src='. .env/bin/activate'
 alias srch='. env/bin/activate'
 alias deac='deactivate'
