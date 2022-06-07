@@ -44,10 +44,10 @@ killscr () {
 alias ..='cd ..'
 alias cd..='cd ..'
 alias cddot='cd $HOME/.dotfiles'
-alias cdwork='cd $HOME/Dropbox/workspaces/'
-alias cdflo='cd $HOME/Dropbox/workspaces/FloodTags/'
-alias cddash='cd $HOME/Dropbox/workspaces/FloodTags/Data_Distribution/dashboard/'
-alias cdeifd='cd $HOME/Dropbox/workspaces/FloodTags/Enrichments/information-extraction/'
+alias cdwork='cd $HOME/workspaces/'
+alias cdflo='cd $HOME/workspaces/FloodTags/'
+alias cddash='cd $HOME/workspaces/FloodTags/Data_Distribution/dashboard/'
+alias cdeifd='cd $HOME/workspaces/FloodTags/Enrichments/information-extraction/'
 
 # Django
 alias pmr='python manage.py runserver'
