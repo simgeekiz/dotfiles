@@ -60,6 +60,8 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
+fortune | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1)
+
 # Enable programmable completion features
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
