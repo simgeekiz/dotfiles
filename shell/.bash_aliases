@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Python
-alias python3='python3.8'
+alias python3='python3.10'
 alias python=python3
 
 # Environment Control
@@ -27,6 +27,10 @@ alias gclone='git clone'
 alias gfet='git fetch'
 alias gfetch='git fetch'
 
+alias gundo='git reset --soft HEAD~1'
+alias gundo2='git reset HEAD~1'
+alias gitreset='git reset --hard HEAD~1'
+
 # nvidia-prime Control
 alias nvidia='sudo prime-select nvidia'
 
@@ -39,6 +43,13 @@ alias scrls='screen -ls'
 killscr () {
   screen -X -S $1 quit
 }
+
+# Tmux Control
+# alias scr='screen'
+alias tmuxnew='tmux new'
+alias tn='tmux new'
+alias tl='tmux ls'
+alias ta='tmux a'
 
 # Folder Navigation;
 alias ..='cd ..'
@@ -73,6 +84,8 @@ fi
 alias ruvpn='screen -S ruvpn bash -c "sudo openvpn $HOME/.dotfiles/vpn/openvpn-science-ru-nl.ovpn"'
 alias ftvpn='screen -S ftvpn bash -c "sudo openvpn $HOME/.dotfiles/vpn/openvpn-floodtags-basar.ovpn"'
 alias flovpn=ftvpn
+
+alias restartterminal='source ~/.bashrc'
 
 # Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
