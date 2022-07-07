@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Python
-alias python='python3.8'
+alias python='python3.10'
 alias python=python3
 
 alias pip='pip3'
@@ -29,6 +29,7 @@ alias gclone='git clone'
 alias gclo=gclone
 alias gfetch='git fetch'
 alias gfet=gfetch
+# alias gaddremote=''
 
 # screen control
 alias scr='screen'

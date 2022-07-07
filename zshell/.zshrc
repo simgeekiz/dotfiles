@@ -11,7 +11,7 @@ echo $the_cow
 
 # set PATH so it includes user's private bin directories
 PATH="$HOME/bin:$HOME/.local/bin:$PATH"
-export PATH="$PATH:/Library/Frameworks/Python.framework/Versions/3.8/bin"
+export PATH="$PATH:/Library/Frameworks/Python.framework/Versions/3.10/bin"
 export PATH=/usr/local/bin:$PATH
 # PATH=$PATH:/Users/sekiz/Library/Python/3.7/bin/
 
