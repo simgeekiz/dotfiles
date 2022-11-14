@@ -11,7 +11,9 @@ alias venv='python3 -m venv .env'
 alias src='. .env/bin/activate'
 alias deac='deactivate'
 
+# Interesting Mix
 alias hist='history | grep'
+alias please='sudo'
 
 # Git aliases
 alias gadd='git add'
@@ -22,16 +24,24 @@ alias gcek='git checkout'
 alias gsta='git status'
 alias gbra='git branch'
 alias gpush='git push'
-alias gpus=gpush
+alias gpus='git push'
 alias gpull='git pull'
-alias gpul=gpull
+alias gpul='git pull'
+alias gclo='git clone'
 alias gclone='git clone'
-alias gclo=gclone
 alias gfetch='git fetch'
-alias gfet=gfetch
-# alias gaddremote=''
+alias gfet='git fetch'
 
-# screen control
+alias gundo='git reset --soft HEAD~1'
+alias gunstage='git reset'
+alias gundonunstage='git reset HEAD~1'
+# //Add text git undo git unstage and discard changes
+alias gundonunstagendiscard='git reset --hard HEAD~1'
+alias gunstagefp='git restore --staged'
+alias gunstagendiscardfp='git restore'
+alias gncek='git checkout -b'
+
+# Screen control
 alias scr='screen'
 alias scrs='screen -S'
 alias scrr='screen -r'
@@ -41,24 +51,25 @@ killscr () {
   screen -X -S $1 quit
 }
 
-# tmux control
+# Tmux control
+alias tmuxnew='tmux new'
 alias tn='tmux new -t'
 alias ta='tmux a -t'
+alias tl='tmux ls'
 alias tls='tmux ls'
+alias tk='tmux kill-ses -t'
+# (ctrl+b) + :kill-session
 
 # Folder Navigation;
+alias ..='cd ..'
 alias cd..='cd ..'
-alias ..=cd..
 alias cddot='cd $HOME/.dotfiles'
 alias cdwork='cd $HOME/workspaces/'
-alias cdsim='cd $HOME/workspaces/sim/'
-alias cderk='cd $HOME/workspaces/erk/'
-alias cdse='cd $HOME/workspaces/simerk/'
-alias cdbas='cd $HOME/workspaces/simerk/basar-dev/'
-alias cdflo='cd $HOME/workspaces/FloodTags/'
 alias cddash='cd $HOME/workspaces/dashboard/'
 
-alias please='sudo'
+# Jekkyl
+alias js='jekyll serve'
+alias bejs='bundle exec jekyll serve'
 
 # Django
 alias pmr='python manage.py runserver'
@@ -66,6 +77,7 @@ alias pmr='python manage.py runserver'
 # Jupyter
 alias jnote='jupyter notebook'
 alias jnotescr='screen -S jnote bash -c "source .env/bin/activate; jupyter notebook"'
+alias jnotescreen='screen -S jnote bash -c "source .env/bin/activate; jupyter notebook"'
 alias jlab='jupyter lab'
 alias jlabscr='screen -S jlab bash -c "source .env/bin/activate; jupyter lab"'
 
@@ -81,12 +93,7 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# Start VPN connections in a screen;
-alias ruvpn='screen -S ruvpn bash -c "sudo openvpn $HOME/.dotfiles/vpn/openvpn-science-ru-nl.ovpn"'
-alias ftvpn='screen -S ftvpn bash -c "sudo openvpn $HOME/.dotfiles/vpn/openvpn-floodtags-basar.ovpn"'
-alias sruvpn='screen -S sruvpn bash -c "sudo openvpn $HOME/.dotfiles/vpn/s-openvpn-science-ru-nl.ovpn"'
-alias sftvpn='screen -S ftvpn bash -c "sudo openvpn $HOME/.dotfiles/vpn/openvpn-credentials-ekiz.ovpn"'
-alias flovpn=ftvpn
+alias restartterminal='source ~/.zshrc'
 
 # Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
