@@ -42,6 +42,11 @@ if [ -f $HOME/.zsh_aliases ]; then
     source $HOME/.zsh_aliases
 fi
 
+# Load the ascii art.
+# if [ -f $HOME/.dotfiles/asciiart/asciiart.rc ]; then
+#     source $HOME/.dotfiles/asciiart/asciiart.rc
+# fi
+
 # set PATH so it includes user's private bin directories
 PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 export PATH="$PATH:/Library/Frameworks/Python.framework/Versions/3.10/bin"

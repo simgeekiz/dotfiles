@@ -1,9 +1,13 @@
 # dotfiles
+                         /\_/\      *What's going on?*
+                        ( o.o )
+                      ------------
+
 My natural habitat  
 
 
 
-__Assuming you have fresh operating system installed;__ 
+## __Assuming you have fresh operating system installed;__ 
 
 <!-- Along these steps I am installing 
     chrome
