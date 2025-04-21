@@ -1,10 +1,10 @@
-cat_6=" 
+cat_1=" 
     /\_/\           ___
    = o_o =_______    \ \  
     __^      __(  \.__) )
 (@)<_____>__(_____)____/
 "
-the_cat="
+cat_2="
     |\__/,|   (\`
   _.|o o  |_   ) )
 -(((---(((--------
@@ -25,4 +25,26 @@ oli_the_cat="
   ( o.o )
 ------------
 "
-echo "$oli_the_cat"
+
+
+# Motivational messages array
+messages=(
+  "You're doing great, keep going! 💪"
+  "Every day is a fresh start. 🌱"
+  "You got this! ✨"
+  "Don't forget to smile today 😺"
+  "Progress, not perfection."
+  "Stay pawsitive! 🐾"
+)
+
+# Store arts in an array
+arts=("$cat_1" "$cat_2" "$meeseeks" "$oli_the_cat")
+
+# Pick one at random
+art_index=$(( (RANDOM % ${#arts[@]}) + 1 ))
+msg_index=$(( (RANDOM % ${#messages[@]}) + 1 ))
+
+# Show the art and message
+echo -e "\n\033[1;32m${messages[$msg_index]}\033[0m"
+echo -e "${arts[$art_index]}"
+

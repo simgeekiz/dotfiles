@@ -58,3 +58,11 @@ My natural habitat
         sudo ln -sfn $HOME/.dotfiles/shell/.zsh_history $HOME/.zsh_history
         sudo ln -sfn $HOME/.dotfiles/shell/.zsh_aliases $HOME/.zsh_aliases 
 
+
+
+### How to change bash to zsh
+        
+        # Install Zsh (if not already installed)
+        sudo apt install zsh
+        # Change the default shell:
+        chsh -s $(which zsh)

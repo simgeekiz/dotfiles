@@ -1,12 +1,18 @@
 fortune | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1)
 
 function with_cat() {
+  # Run any command passed in
   "$@"
   echo "
      /\\_/\\
     ( o.o )
      > v <
   ------------"
+}
+
+function ls() {
+  command ls "$@"  # runs the real `ls`, bypassing your custom function
+  with_cat
 }
 
 # Python
@@ -121,13 +127,13 @@ alias jlab='jupyter lab'
 alias jlabscr='screen -S jlab bash -c "source .env/bin/activate; jupyter lab"'
 
 # ls and ls color
-alias ll='with_cat ls -al'
-alias la='with_cat ls -A'
-alias lla='with_cat ls -lah'
+alias ll='ls -al'
+alias la='ls -A'
+alias lla='ls -lah'
 alias cls='clear;ls'
 # show me files matching "ls grep"
 alias lsg='ll | grep'
-alias lll='with_cat ls -alF'
+alias lll='ls -alF'
 alias l='ls -CF'
 
 if [ -x /usr/bin/dircolors ]; then
