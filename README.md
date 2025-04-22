@@ -7,62 +7,86 @@ My natural habitat
 
 
 
-## __Assuming you have fresh operating system installed;__ 
+### __Assuming you have fresh operating system installed;__ 
 
 <!-- Along these steps I am installing 
     chrome
     Visual Studio (sync with github not microsoft)
     From software manager: 
-    Slack 
+    # Slack 
     GUAKE terminal
 -->
 
-1. First you need to install git
+## __Prerequisites Linux:__  
+
+Ensure you have git and zsh installed.  
+
+1. Install Zsh 
+
+        $ echo $SHELL
+
+    If it returns /bin/zsh → You're using zsh  
+    
+    If it returns /bin/bash → You're using bash 
+    Please continue to install zsh
+
+    - If zsh not already installed   
+      
+          $ sudo apt install zsh
         
-        # Make sure you have git   
-        sudo apt-get install git   
+    - Change the default shell:
+
+          $ chsh -s $(which zsh)
+          $ reboot
+
+2. Install git  
+ 
+        $ sudo apt-get install git   
         or   
-        sudo apt install git  
+        $ sudo apt install git  
 
-2. Clone this repository
+## __Prerequisites MacOS:__
 
-        <!-- git clone https://github.com/simgeekiz/dotfiles.git -->  
-        
-        git clone https://github.com/simgeekiz/dotfiles.git ~/.dotfiles 
-        cd ~/.dotfiles
+Ensure you have brew and git.
 
-    or 
+1. Install brew
 
-        # Clone the repository
-        git clone github_repository_dotfiles
-        # rename the repository
-        mv dotfiles .dotfiles
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-4. If you want change bash to zsh:  
+        echo >> /Users/sekiz/.zprofile
+        echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
+        eval "$(/usr/local/bin/brew shellenv)"
 
-        $ sudo apt install zsh
-        Change the default shell:
-        $ chsh -s $(which zsh)
-        $ reboot
+        # verify the installation
+        brew --version
 
-3. Installation:
+2. Install git 
 
-        bash ./.dotfiles/setup/install.zsh 
-        or 
-        zsh  ./.dotfiles/setup/install.sh  
+        brew install git
 
-    or
+## __Installation__
+- Generate SSH key.
+    - Follow the instructions in ssh/ssh_key.md
+    
+- Clone this repository
 
-        # define the symlinks by yourself
-        sudo ln -sfn $HOME/.dotfiles/zshell/.zshrc $HOME/.zshrc  
-        sudo ln -sfn $HOME/.dotfiles/shell/.zsh_history $HOME/.zsh_history
-        sudo ln -sfn $HOME/.dotfiles/shell/.zsh_aliases $HOME/.zsh_aliases 
+      # Clone the repository
+      git clone git@github.com:simgeekiz/dotfiles.git ~/.dotfiles 
 
+- If you don't want to use the SSH link (uses SSH key) Use HTTPS link.
+       
+      # Clone the repository
+      git clone https://github.com/simgeekiz/dotfiles.git ~/.dotfiles 
 
+- Run setup script:
 
-### How to change bash to zsh
-        
-        # Install Zsh (if not already installed)
-        sudo apt install zsh
-        # Change the default shell:
-        chsh -s $(which zsh)
+      zsh ./.dotfiles/git/git_setup.zsh
+      zsh  ./.dotfiles/setup/install.zsh  
+      
+
+## __Resources__
+
+- [GitHub ~/](http://dotfiles.github.io/)
+- [Erkan's dotfiles](https://github.com/ErkanBasar/dotfiles)
+- [Sapegin's dotfiles](https://github.com/sapegin/dotfiles)
+---

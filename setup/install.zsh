@@ -48,6 +48,16 @@ if [[ $unamestr == "Linux" ]]; then
   
 elif [[ $unamestr == "Darwin" ]]; then
   printlog "Platform detected as macOS. Installing accordingly."
+
+   # Having a little bit fun
+  brew install fortune
+  brew install cowsay
+
+  # Installing Tmux
+  brew install tmux
+
+  # Installing pip
+  python3 -m ensurepip --upgrade
 fi
 
 if [ -n "$BASH_VERSION" ]; then
@@ -63,7 +73,7 @@ if [ -n "$BASH_VERSION" ]; then
   create_symbolic_link $HOME/.dotfiles/shell/.bash_logout $HOME/.bash_logout
   create_symbolic_link $HOME/.dotfiles/shell/.profile $HOME/.profile 
 
-  # echo "-------------------------Github configurations-------------------------"
+  # Github configurations
   # bash  $HOME/.dotfiles/git/git_setup.zsh 
   
   #Install jekyll
@@ -82,11 +92,12 @@ elif [ -n "$ZSH_VERSION" ]; then
   create_symbolic_link $HOME/.dotfiles/zshell/.zshrc $HOME/.zshrc 
   create_symbolic_link $HOME/.dotfiles/zshell/.zsh_aliases $HOME/.zsh_aliases
   create_symbolic_link $HOME/.dotfiles/zshell/.zsh_history $HOME/.zsh_history
+  create_symbolic_link $HOME/.dotfiles/zshell/.zprofile $HOME/.zprofile
 
-  # echo "-------------------------Github configurations-------------------------"
+  # Github configurations
   # zsh $HOME/.dotfiles/git/git_setup.zsh
 
-  #Install jekyll
+  # Install jekyll
   # zsh $HOME/.dotfiles/jekyll/install.zsh
 
   #Install Re-volt

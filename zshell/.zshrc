@@ -1,8 +1,12 @@
 # Set up the prompt
-
 autoload -Uz promptinit
 promptinit
-prompt adam1
+# prompt redhat
+# alternative liked ones
+# redhat [%n@%m %1~]%(#.#.$) 
+# restore %n@%m %1~ %# 
+# suse %n@%m:%~/ > 
+PS1='%B%n@%m %~ %#%b '
 
 setopt histignorealldups sharehistory
 
@@ -41,6 +45,15 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 if [ -f $HOME/.zsh_aliases ]; then
     source $HOME/.zsh_aliases
 fi
+
+# Fortune and Cowsay
+# Get list of cowsay animals as array
+animals=(${(f)"$(cowsay -l)"})
+# Pick one at random
+animals_index=$(( (RANDOM % ${#animals[@]}) + 1 ))
+random_animal=${animals[$animals_index]}
+
+fortune -s | cowsay -f $random_animal
 
 # Load the ascii art.
 # if [ -f $HOME/.dotfiles/asciiart/asciiart.rc ]; then
