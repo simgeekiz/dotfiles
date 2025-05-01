@@ -1,0 +1,25 @@
+# Command-line tools (brew installs)
+brew "git"
+brew "fortune"
+brew "cowsay"
+brew "tmux"
+brew "python"
+brew "wget"             # Regular Homebrew formula
+brew "zsh-syntax-highlighting"
+
+# GUI apps
+cask "firefox"
+cask "google-chrome"
+cask "visual-studio-code"
+
+# vscode extensions
+vscode "github.copilot"
+vscode "github.copilot-chat"
+vscode "ms-python.debugpy"
+vscode "ms-python.python"
+vscode "ms-python.vscode-pylance"
+vscode "ms-toolsai.jupyter"
+vscode "ms-toolsai.jupyter-keymap"
+vscode "ms-toolsai.jupyter-renderers"
+vscode "ms-toolsai.vscode-jupyter-cell-tags"
+vscode "ms-toolsai.vscode-jupyter-slideshow"

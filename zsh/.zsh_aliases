@@ -9,7 +9,7 @@ function with_cat() {
 }
 
 function ls() {
-  command ls "$@"  # runs the real `ls`, bypassing your custom function
+  command ls --color "$@"  # runs the real `ls`, bypassing your custom function
   with_cat
 }
 
@@ -104,11 +104,6 @@ alias tdetach='tmux detach'
 # alias tkallbc='tmux kill-session -a'
 # (ctrl+b) + :kill-session
 
-# Folder Navigation;
-alias ..='cd ..'
-alias cd..='cd ..'
-alias cddot='cd $HOME/.dotfiles'
-alias cdwork='cd $HOME/workspaces/'
 
 # Jekkyl
 alias js='jekyll serve'
@@ -124,23 +119,27 @@ alias jnotescreen='screen -S jnote bash -c "source .env/bin/activate; jupyter no
 alias jlab='jupyter lab'
 alias jlabscr='screen -S jlab bash -c "source .env/bin/activate; jupyter lab"'
 
+# File System shortcuts
+alias md='mkdir -p'
+alias rd=rmdir
+
+# Navigations
+alias -g ...='../..'
+alias ..='cd ..'
+alias cd..='cd ..'
+alias cddot='cd $HOME/.dotfiles'
+alias cdwork='cd $HOME/workspaces/'
+
 # ls and ls color
 alias ll='ls -al'
 alias la='ls -A'
 alias lla='ls -lah'
 alias cls='clear;ls'
+alias lsa='ls -lah'
 # show me files matching "ls grep"
 alias lsg='ll | grep'
 alias lll='ls -alF'
 alias l='ls -CF'
-
-if [ -x /usr/bin/dircolors ]; then
-    test -r $HOME/.dircolors && eval "$(dircolors -b $HOME/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
 
 # df(short for disk free) is used to show the amount of free disk space available
 # Show human friendly numbers and colors 

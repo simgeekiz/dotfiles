@@ -1,4 +1,28 @@
-.zsh_history
-TODO
+# custom files
+custom/
 mininotes.md
+try*
+/terminal/backups
+TODO*
+
+# temp files directories
+*.cache
+cache/
+log/
+*.swp
+*.log
+.eslintcache
+
+# editor configs
+.vscode
+.idea
+vscode/**/History/
+vscode/**/globalStorage/
+vscode/**/workspaceStorage/
+
+# macOS
 .DS_Store
+Thumbs.db
+
+# zsh history
+.zsh_history

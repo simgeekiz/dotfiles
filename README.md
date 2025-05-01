@@ -17,54 +17,11 @@ My natural habitat
     GUAKE terminal
 -->
 
-## __Prerequisites Linux:__  
+## __Prerequisites:__  
 
-Ensure you have git and zsh installed.  
+Ensure you have; 
+- git
 
-1. Install Zsh 
-
-        $ echo $SHELL
-
-    If it returns /bin/zsh → You're using zsh  
-    
-    If it returns /bin/bash → You're using bash 
-    Please continue to install zsh
-
-    - If zsh not already installed   
-      
-          $ sudo apt install zsh
-        
-    - Change the default shell:
-
-          $ chsh -s $(which zsh)
-          $ reboot
-
-2. Install git  
- 
-        $ sudo apt-get install git   
-        or   
-        $ sudo apt install git  
-
-## __Prerequisites MacOS:__
-
-Ensure you have brew and git.
-
-1. Install brew
-
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-        echo >> /Users/sekiz/.zprofile
-        echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
-        eval "$(/usr/local/bin/brew shellenv)"
-
-        # verify the installation
-        brew --version
-
-2. Install git 
-
-        brew install git
-
-## __Installation__
 - Generate SSH key.
     - Follow the instructions in ssh/ssh_key.md
     
@@ -78,11 +35,17 @@ Ensure you have brew and git.
       # Clone the repository
       git clone https://github.com/simgeekiz/dotfiles.git ~/.dotfiles 
 
+
+## __Installation__
+
+- Check zsh installed and it is your current shell.  
+
+      # depending on the $SHELL use bash or zsh:
+      bash/zsh .dotfiles/setup/prerequisites.sh
+
 - Run setup script:
 
-      zsh ./.dotfiles/git/git_setup.zsh
-      zsh  ./.dotfiles/setup/install.zsh  
-      
+      zsh ./.dotfiles/setup/setup.zsh 
 
 ## __Resources__
 
