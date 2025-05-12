@@ -12,20 +12,35 @@ promptinit
 # alternative liked ones redhat [%n@%m %1~]%(#.#.$)  restore %n@%m %1~ %#  suse %n@%m:%~/ > 
 PS1='%B%n@%m %~ %#%b '
 
+### History ###
 setopt histignorealldups sharehistory
+# Remove older duplicate entries from history
+setopt hist_ignore_all_dups
+# Remove superfluous blanks from history items
+setopt hist_reduce_blanks
+# Don't store commands prefixed with a space
+setopt hist_ignore_space
+# Show command with history expansion to user before running it
+setopt hist_verify
 
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
+# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
+HISTSIZE=100000
+SAVEHIST=$HISTSIZE
+HISTFILE=~/.zsh_history
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+#### Turn off the sometimes annoying beep
+setopt NO_BEEP
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
-
-
-### Completion ###
-if [ -f $HOME/.dotfiles/zsh/completion.zsh ]; then
-    source $HOME/.dotfiles/zsh/completion.zsh
-fi
-
 
 ### APPEARANCE ###
 # Sets color variable such as $fg, $bg, $color and $reset_color
@@ -57,33 +72,31 @@ if [[ -z "$LS_COLORS" ]]; then
   fi
 fi
 
-
 ### Directory Navigation ###
 # Allows you to change directories just by typing the directory name
 setopt auto_cd
+setopt correct_all
 
-
-### History ###
-# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
-HISTSIZE=1000
-SAVEHIST=1000
-HISTFILE=~/.zsh_history
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-
+# Load configs
 ### Aliases ###
-# Load alias definitions.
 if [ -f $HOME/.zsh_aliases ]; then
     source $HOME/.zsh_aliases
 fi
+### Completion ###
 
+# Uncomment the following line to use case-sensitive completion.
+CASE_SENSITIVE="true"
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+HYPHEN_INSENSITIVE="true"
+
+if [ -f $HOME/.dotfiles/zsh/completion.zsh ]; then
+    source $HOME/.dotfiles/zsh/completion.zsh
+fi
+### Key Bindings ###
+if [ -f $HOME/.dotfiles/zsh/key-bindings.zsh ]; then
+    source $HOME/.dotfiles/zsh/key-bindings.zsh
+fi
 
 ### Fortune and Cowsay ###
 # # Get list of cowsay animals as array

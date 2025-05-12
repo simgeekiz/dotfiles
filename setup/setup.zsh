@@ -37,50 +37,46 @@ printlog () {
     echo "---------------------------------------------------------------------------" >&2
 }
 
-# Testing the is_file_exist function
-# isFile=$(is_file_exists "$HOME/.bashrc")
-# echo "$isFile"
-
 # Exit on any failed command
 set -e
 
+# Check if Zsh is installed If not, exit
 if [ -n "$ZSH_VERSION" ]; then
   printlog "You are running Zsh (version: $ZSH_VERSION)"
-
-  # Install dependencies  
-  echo "☕️ Installing dependencies..."
-  zsh $HOME/.dotfiles/setup/install.zsh
-  
-  # Github configurations
-  zsh $HOME/.dotfiles/git/git_setup.zsh
-
-  # Install Powerlevel10k
-  echo "🌌 Installing Powerlevel10k..."
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-  create_symbolic_link $HOME/.dotfiles/terminal/.p10k.zsh $HOME/.p10k.zsh
-
-  #### Creating Symlinks / Bootsrapping
-  echo "🐿️ Setting up Symlinks..."
-  # Shell
-  if is_file_exists "$HOME/.zshrc"; then
-    mv $HOME/.zshrc $HOME/.zshrc_old
-  fi
-  create_symbolic_link $HOME/.dotfiles/zsh/.zshrc $HOME/.zshrc 
-  create_symbolic_link $HOME/.dotfiles/zsh/.zsh_aliases $HOME/.zsh_aliases
-  create_symbolic_link $HOME/.dotfiles/zsh/.zsh_history $HOME/.zsh_history
-  create_symbolic_link $HOME/.dotfiles/zsh/.zprofile $HOME/.zprofile
-
-  # Git
-  # .gitconfig
-
-  # Autostart
-  # sudo rm -rf $HOME/.config/autostart/
-  # sudo ln -sfn $HOME/.dotfiles/autostart/ $HOME/.config/autostart
-
 else
-  echo "🥀 You are still running an unknown shell: $SHELL"
-  echo "🛑 Please install Zsh and run this script again."
+  printlog "🥀 You are still running an unknown shell: $SHELL \n \
+  🛑 Please install Zsh and run this script again."
+  exit 1
 fi
+
+# Run the installation script
+zsh $HOME/.dotfiles/setup/install.zsh
+
+
+# Github configurations
+zsh $HOME/.dotfiles/git/git_setup.zsh
+
+# Install Powerlevel10k
+echo "🌌 Installing Powerlevel10k..."
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+create_symbolic_link $HOME/.dotfiles/tilde/.p10k.zsh $HOME/.p10k.zsh
+
+#### Creating Symlinks / Bootsrapping
+echo "🐿️ Setting up Symlinks..."
+# Shell
+if is_file_exists "$HOME/.zshrc"; then
+  mv $HOME/.zshrc $HOME/.zshrc_old
+fi
+create_symbolic_link $HOME/.dotfiles/zsh/.zshrc $HOME/.zshrc 
+create_symbolic_link $HOME/.dotfiles/zsh/.zsh_aliases $HOME/.zsh_aliases
+create_symbolic_link $HOME/.dotfiles/zsh/.zprofile $HOME/.zprofile
+
+# Git
+# .gitconfig
+
+# Autostart
+# sudo rm -rf $HOME/.config/autostart/
+# sudo ln -sfn $HOME/.dotfiles/autostart/ $HOME/.config/autostart
 
 echo "🦆 Restarting Terminal"  
 exec $SHELL

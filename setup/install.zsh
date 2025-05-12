@@ -1,11 +1,12 @@
 #!/bin/zsh
 
-function printlog () {
-    echo
-    echo "---------------------------------------------------------------------------" >&2
-    echo "$1"
-    echo "---------------------------------------------------------------------------" >&2
-}
+# Installation script for Linux and MacOS
+# - installs all the needed software;
+# - installs Re-volt;
+#
+# Author: Simge Ekiz
+# License: MIT
+# https://github.com/simgeekiz/dotfiles
 
 function install_fonts() {
   # This script installs custom fonts from a specified source directory to the target font directory.
@@ -33,61 +34,39 @@ function install_fonts() {
   fi
 }
 
-# Install Jekyll
-function install_jekyll() {
-  # This script installs Jekyll and its dependencies.
+# Ask the user if they want to install any applications or update the system
+echo
+while true; do
+  printf "🛠️  Do you want to install CLI tools and update the system? [Y/n]: "
+  read install_cli
+  install_cli=$(echo "$install_cli" | xargs) # Trim whitespace
+  install_cli=${install_cli:-y}  # set default to 'y' if empty
 
-  echo "🧪  Installing Jekyll..."
+  case "$install_cli" in
+    y|Y|yes|YES|Yes|YeS|yEs|YEs)
+      break
+      ;;
+    n|N|no|NO|No|nO ) 
+      exit 1   
+      break
+      ;;
+    * )
+      echo "🎸 Please answer yes [y] or no [n]."
+      ;;
+  esac
+done
 
-  # Check if Jekyll is already installed
-  if ! command -v jekyll &> /dev/null; then
-    echo "🐥 Jekyll not found. Installing..."
-    gem install jekyll bundler
-    # echo "✅ Jekyll installed!"
-  else
-    echo "🐣 Jekyll is already installed."
-  fi
-
-  sudo apt-get install ruby-full build-essential zlib1g-dev
-
-  if [ -f "$HOME/.localrc" ]; then
-      # echo "$HOME/.localrc exists. Using the original file"
-  else 
-      # echo "$HOME/.localrc does not exist. creating one"
-      touch $HOME/.localrc
-      chmod 755 $HOME/.localrc 
-  fi 
-
-  echo '# Install Ruby Gems to ~/gems' >> ~/.localrc
-  echo 'export GEM_HOME="$HOME/gems"' >> ~/.localrc
-  echo 'export PATH="$HOME/gems/bin:$PATH"' >> ~/.localrc
-
-  exec "$SHELL" -l
-
-  sudo gem install jekyll bundler
-
-  # Then follow the instruction from your project 
-  # Probably the steps are following:
-  # $ bundle config set --local path 'vendor/bundle'
-  # $ bundle install
-  # Then Go to the project folder where you can find Gemfile.
-  # $ cd <path_to_dashboard_repository> 
-  # Run the server.
-  # $ bundle exec jekyll serve 
-}
-
-# Function to create symbolic links
 # Get operating system
 unamestr=$(uname)
 if [[ $unamestr == "Linux" ]]; then
   printlog "🌲 Platform detected as Linux. Installing accordingly."
-
   # Update the system
   echo "🔄 Updating system..."
   sudo apt update && sudo apt upgrade -y
 
   # Array of packages to install CLI(command line Interface)   # cmake fortune-mod cowsay htop, tree, tmux, vim
-  cli_packages=("git" "python3" "python3-pip" "curl" "vim" "tmux" "wget" "build-essential" "snapd")
+  # "zsh" "vim" "htop" "tree" "jq" "cmake" "fortune-mod" "cowsay" "python-is-python3
+  cli_packages=("git" "python3" "python3-pip" "curl" "tmux" "wget" "build-essential")
 
   for package in "${cli_packages[@]}"; do
     echo "⚒️ Installing $package"
@@ -115,6 +94,7 @@ if [[ $unamestr == "Linux" ]]; then
         gui_apps=("code" "slack" "google-chrome" "vlc")
         # Install GUI applications using snap
         for ap in "${gui_apps[@]}"; do
+          sudo apt install -y snapd
           echo "🏡 Installing $ap"
           sudo snap install --classic "$ap" || echo "Unable to install $ap"
           # # Check if the package is already installed
@@ -135,51 +115,6 @@ if [[ $unamestr == "Linux" ]]; then
         echo "📝 Skipping GUI apps..."
         break
         ;;
-      * )
-        echo "🎸 Please answer yes [y] or no [n]."
-        ;;
-    esac
-  done
-
-  # Ask the user if they want to install Jekyll 
-  echo
-  while true; do
-    printf "🧪 Do you want to install Jekyll? [Y/n]: "
-    read install_jekyll
-    install_jekyll=$(echo "$install_jekyll" | xargs) # Trim whitespace
-    install_jekyll=${install_jekyll:-y}  # set default to 'y' if empty
-
-    case $install_jekyll in
-      y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-        # Install Jekyll
-        install_jekyll
-        break;;
-      n|N|no|NO|No|nO )
-        echo "🗄️ Skipping Jekyll installation..."
-        break;;
-      * ) 
-        echo "🎸 Please answer yes [y] or no [n]."
-        ;;
-    esac
-  done
-  
-  # Ask the user if they want to install Re-volt
-  echo
-  while true; do
-    printf "🏎️ Do you want to install Re-Volt? [Y/n]: "
-    read install_revolt
-    install_revolt=$(echo "$install_revolt" | xargs) # Trim whitespace
-    install_revolt=${install_revolt:-y}  # set default to 'y' if empty
-
-    case $install_revolt in
-      y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-        echo "🚙 Installing Re-Volt..."
-        # Install Re-Volt
-        zsh $HOME/.dotfiles/revolt/install.zsh
-        break;;
-      n|N|no|NO|No|nO )
-        echo "🗑️ Skipping Re-Volt installation..."
-        break;;
       * )
         echo "🎸 Please answer yes [y] or no [n]."
         ;;
@@ -211,11 +146,6 @@ if [[ $unamestr == "Linux" ]]; then
     esac
   done
 
-  # fzf, fuzzy finder
-  # echo "🌁 Configuring fzf..."
-  # $(brew --prefix)/opt/fzf/install
-  # echo
-
   echo "⚙️ Updating & Upgrading & Autoremoving"
   sudo apt update
   sudo apt upgrade
@@ -223,7 +153,7 @@ if [[ $unamestr == "Linux" ]]; then
   sudo apt clean
 
 elif [[ $unamestr == "Darwin" ]]; then
-  printlog "🌲 Platform detected as macOS. Installing accordingly."
+  printlog "🍎 Platform detected as macOS. Installing accordingly."
 
   # Ask the user if they want to install GUI applications
   while true; do
@@ -234,32 +164,58 @@ elif [[ $unamestr == "Darwin" ]]; then
     install_gui=${install_gui:-y}  # set default to 'y' if empty
     case "$install_gui" in
       y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-        echo "☕️ Installing Homebrew dependencies...\n🏡 Setting up GUI apps..."
-        brew bundle install --file="$HOME/.dotfiles/setup/Brewfile"
-        break
-        ;;
+      echo "☕️ Installing Homebrew dependencies...\n🏡 Setting up GUI apps..."
+      brew bundle install --file="$HOME/.dotfiles/setup/Brewfile"
+      break
+      ;;
       n|N|no|NO|No|nO ) 
-        # to install only CLI tools (strip cask lines)
-        echo "☕️ Installing Cli tools and libraries... \n📝 Skipping GUI apps..."
-        grep -v '^cask ' "$HOME/.dotfiles/setup/Brewfile" > "$HOME/.dotfiles/setup/Brewfile.cli"
-        brew bundle install --file="$HOME/.dotfiles/setup/Brewfile.cli"
-        # rm "$HOME/.dotfiles/setup/Brewfile.cli"
-        break
-        ;;
+      # to install only CLI tools (strip cask lines)
+      echo "☕️ Installing Cli tools and libraries... \n📝 Skipping GUI apps..."
+      grep '^brew ' "$HOME/.dotfiles/setup/Brewfile" > "$HOME/.dotfiles/setup/Brewfile.cli"
+      brew bundle install --file="$HOME/.dotfiles/setup/Brewfile.cli"
+      rm "$HOME/.dotfiles/setup/Brewfile.cli"
+      break
+      ;;
       * )
-        echo "🎸 Please answer yes [y] or no [n]."
-        ;;
+      echo "🎸 Please answer yes [y] or no [n]."
+      ;;
     esac
   done
 
-  # Installing pip
-  # python3 -m ensurepip --upgrade
+  # fzf, fuzzy finder
+  # echo "🌁 Configuring fzf..."
+  # $(brew --prefix)/opt/fzf/install
+  # echo
 
   # Installing custom fonts
   install_fonts
 
+else
+  # Unknown or unsupported OS
+  printlog "❌ Unsupported platform: $unamestr"
+  exit 1
 fi
 
 
-
-
+# Ask the user if they want to install Re-volt
+echo
+while true; do
+  printf "🏎️ Do you want to install Re-Volt? [Y/n]: "
+  read install_revolt
+  install_revolt=$(echo "$install_revolt" | xargs) # Trim whitespace
+  install_revolt=${install_revolt:-y}  # set default to 'y' if empty
+  
+  case $install_revolt in
+    y|Y|yes|YES|Yes|YeS|yEs|YEs) 
+      echo "🚙 Installing Re-Volt..."
+      # Install Re-Volt
+      zsh $HOME/.dotfiles/revolt/install.zsh
+      break;;
+    n|N|no|NO|No|nO )
+      echo "🗑️ Skipping Re-Volt installation..."
+      break;;
+    * )
+      echo "🎸 Please answer yes [y] or no [n]."
+      ;;
+  esac
+done

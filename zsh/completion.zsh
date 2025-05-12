@@ -18,6 +18,8 @@ setopt always_to_end    # Move cursor to end if word had one match
 unsetopt menu_complete   # do not autoselect the first completion entry
 unsetopt flowcontrol
 setopt complete_in_word
+# Do not expand ~ to full home path in completion
+setopt NO_COMPLETE_ALIASES
 
 # enables interactive menu selection with arrow keys
 zstyle ':completion:*' menu select
@@ -27,11 +29,11 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 # # Group results by category
 # zstyle ':completion:*' group-name ''
 
-# Ctrl-O will accept the current completion 
-bindkey -M menuselect '^o' accept-and-infer-next-history
 #Ensures that the completion menu is always shown
 zstyle ':completion:*:*:*:*:*' menu select 
 
+# Make completion case-insensitive
+# zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 # case insensitive (all), partial-word and substring completion
 if [[ "$CASE_SENSITIVE" = true ]]; then
   zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
@@ -60,6 +62,12 @@ zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-dir
 # Use caching so that commands like apt and dpkg complete are useable
 zstyle ':completion:*' use-cache yes
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
+
+# Add trailing slash for symlinked dirs
+zstyle ':completion:*' mark-symlinked-directories true
+
+# Limit large completion lists
+zstyle ':completion:*' completions 200
 
 # Don't complete uninteresting users
 zstyle ':completion:*:*:*:users' ignored-patterns \
