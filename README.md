@@ -52,4 +52,9 @@ Ensure you have;
 - [GitHub ~/](http://dotfiles.github.io/)
 - [Erkan's dotfiles](https://github.com/ErkanBasar/dotfiles)
 - [Sapegin's dotfiles](https://github.com/sapegin/dotfiles)
+- [Paulmillr's dotfiles](https://github.com/paulmillr/dotfiles)
+- [Mathiasbynens's dotfiles](https://github.com/mathiasbynens/dotfiles)
+- [Lewagon's dotfiles](https://github.com/lewagon/dotfiles)
+- [Holman's dotfiles](https://github.com/holman/dotfiles)
+
 ---

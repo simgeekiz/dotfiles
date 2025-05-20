@@ -1,0 +1,90 @@
+[init]
+	defaultBranch = main
+
+[color]
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+  ui = auto
+
+[branch]
+	sort = -committerdate
+
+[alias]
+  co = checkout   # Add (stage) file
+  ch = checkout
+  br = branch
+  ci = commit
+  st = status   # Status
+  s = status --short
+  a = add   
+  ua = reset HEAD # Add (stage) file
+  d = diff
+  # Sharable diff with disabled syntax highlighting and +/- marks
+  patch = !git --no-pager diff --no-color
+  # Merge fresh master into the current branch
+  mmm = !git fetch origin master && git merge origin/master --no-edit
+  mmn = !git fetch origin main && git merge origin/main --no-edit
+  # Compact and readable log
+  l = log --graph --pretty=format:'%C(magenta)%h%C(blue)%d%Creset %s %C(blue bold)- %an, %ar%Creset'
+  # Log with list of changed files for each commit
+  ll = log --stat --abbrev-commit
+  # List of my own commits
+  my = !git log --branches=* --no-merges --pretty=format:'%C(reset)%C(bold)%cd %C(reset)%C(white)%s  %C(reset)%h' --date=short --author=\"$(git config user.name)\"
+  # List of branches ordered by last change
+  branches = for-each-ref --sort=-committerdate refs/heads/ --format='%(color:bold)%(refname:short)%(color:reset)\t%(committerdate:relative)'
+  # List of files with merge conflicts
+  wtf = diff --name-only --diff-filter=U
+  # Rebase: add changes and continue
+  cont = !git add . && git rebase --continue
+  # Rebase: skip a rebase step
+  skip = rebase --skip
+  # Rebase: abort
+  abort = rebase --abort
+  # Cancel local commits in the branch: git fuck master
+  fuck = "!f() { git reset --hard origin/$1; }; f"
+  # Remove all changes, including untracked files
+  nuke = !git reset --hard && git clean -f -d
+  # Add all modified files to the latest commit
+  append = commit -a --amend --no-edit
+
+[pull]
+  # Don't rebase on pulling: annoying, especially in VS Code
+  rebase = false
+
+[push]
+  default = simple
+
+[fetch]
+	# Automatically prune deleted branches from your local copy when you fetch (or pull)
+	prune = true
+
+[log]
+	# Show branch names with git log
+	decorate = short
+
+[merge]
+	conflictstyle = merge
+
+# Include local settings
+[include]
+	path = .gitlocal
+
+[advice]
+  statusHints = false
+
+[format]
+  pretty = %Cred%h%Creset%C(yellow)%d%Creset %s %Cgreen(%cd) %C(bold blue)[%an]%Creset
+
+[color "diff"]
+  meta = yellow bold
+  commit = cyan bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+  whitespace = red reverse
+
+[user]
+	email = simgeekiz48@gmail.com
+	name = Simge Ekiz
