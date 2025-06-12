@@ -1,0 +1,42 @@
+#!/bin/zsh
+# ---
+# Author: Simge Ekiz
+# ---
+# This script is a replacement for the standard `rm` command.
+# It prompts the user for confirmation before deleting files or directories.
+# It is designed to be used as a safer alternative to the `rm` command.
+# Usage: rm [options] <file1> <file2> ...
+# Options:
+#   -f, --force    Ignore nonexistent files and never prompt    
+#   -i, --interactive  Prompt before every removal
+#   -r, --recursive  Remove directories and their contents recursively
+#
+# Usage:  rm [options] <file1> <file2> ...
+
+has_dir=0
+
+for item in "$@"; do
+  if [ -d "$item" ]; then
+    has_dir=1
+    break
+  fi
+done
+
+if [ $has_dir -eq 1 ]; then
+  echo -e "\e[31m[Warning]\e[0m You are about to delete a directory!"
+fi
+
+echo -n "Are you sure you want to delete: "
+for item in "$@"; do
+  echo -n "\"$item\" "
+done
+echo -n "? (y/n) "
+
+read -r answer
+if [[ "$answer" == [Yy]* ]]; then
+  command rm -rf "$@"
+else
+  echo -e "\e[32mAborted.\e[0m"
+fi
+
+

@@ -1,0 +1,15 @@
+#!/bin/zsh
+# ---
+# Author: Simge Ekiz
+# ---
+# This script is a simple wrapper for the speedtest-cli Python script.
+# It downloads the script from the official repository and executes it.
+# It is designed to be a quick and easy way to run a speed test from the command line.
+
+# Usage: speedtest
+
+if [ -f $HOME/.dotfiles/bin/speedtest.py ]; then
+  python3 $HOME/.dotfiles/bin/speedtest.py
+else
+  curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3
+fi

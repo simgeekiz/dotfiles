@@ -1,0 +1,48 @@
+#!/usr/bin/env zsh
+# Author: Simge Ekiz
+# License: MIT 
+#
+# Update script for Linux and MacOS
+# - updates the system packages;  
+# - cleans up unnecessary packages;
+
+magenta='\e[1;35m'
+white='\e[0;37m'
+
+# Since some programs are installed in non-root directories,
+# don't run this script as root to avoid permission conflict.
+if [[ $EUID -eq 0 ]]; then
+    echo "Don't run this script as root"
+    exit 1
+fi
+
+
+update_and_upgrade() {
+  echo "${magenta}⚙️ Updating Package List...${white}"
+  sudo apt update
+
+  echo -e "${magenta}⬆️ Upgrading System Packages (full-upgrade)...${white}"
+  sudo apt full-upgrade -y
+}
+
+echo "${magenta}Updating and Upgrading System Packages.\nThis may take a while, please be patient...${white}"
+
+# Autoremove unnecessary packages. Clean up the local repository of retrieved package files.
+autoremove() {
+  echo "${magenta}🗑️ Autoremoving Unnecessary Packages...${white}"
+  sudo apt autoremove -y
+  echo "${magenta}🧽 Cleaning Up Local Repository... ${white}"
+  sudo apt clean
+}
+
+if $(uname | grep -q "Linux"); then
+  update_and_upgrade
+  autoremove
+elif $(uname | grep -q "Darwin"); then
+  # Make sure we’re using the latest Homebrew.
+  brew update
+  # Upgrade any already-installed formulae.
+  brew upgrade
+  
+fi
+

@@ -1,0 +1,77 @@
+#!/bin/zsh
+# ---
+# Author: Simge Ekiz
+# ---
+# For headphone to work properly
+#
+# Usage:  turnonheadphones
+
+function run_pafile() {
+  if [[ -x "$pafile" ]]; then
+    echo
+    while true; do
+      printf "🛠️  Run the script? [Y/n]: "
+      read run_pafile
+      run_pafile=$(echo "$run_pafile" | xargs) # Trim whitespace
+      run_pafile=${run_pafile:-y}  # set default to 'y' if empty
+
+      case "$run_pafile" in
+        y|Y|yes|YES|Yes|YeS|yEs|YEs)
+          bash "$pafile" | nc termbin.com 9999
+          break
+          ;;
+        n|N|no|NO|No|nO ) 
+          echo "Aborted."
+          break
+          ;;
+        * )
+          echo "🎸 Please answer yes [y] or no [n]."
+          ;;
+      esac
+    done
+
+  else
+    echo "Script is not executable or not found."
+    return 1
+  fi
+}
+
+# Check if the script exists and is executable
+pafile="$HOME/.dotfiles/bin/pa-info"
+hash_file="$HOME/.dotfiles/privates/pa-info.sha256"
+expected_hash=$(awk '{print $1}' "$hash_file")
+
+if [[ ! -e $pafile ]]; then
+  curl -fsSL "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/raw/master/src/utils/pa-info?inline=false" -o "$pafile"
+  chmod +x $pafile
+
+  if [[ ! -s "$pafile" ]]; then
+    echo "Download failed or empty script."
+    rm -f "$pafile"
+    return 1
+  fi
+
+  echo "Contents:"
+  echo "----------------------"
+  head -n 50 "$pafile" # show preview
+  echo "----------------------"
+
+  actual_hash=$(sha256sum "$pafile" | awk '{print $1}')
+
+  if [[ "$actual_hash" != "$expected_hash" ]]; then
+    echo "⚠️  Hash mismatch!"
+    echo "Expected: $expected_hash"
+    echo "Actual:   $actual_hash"
+    echo "Script may have been tampered with. Aborting."
+    rm -f "$tmpfile"
+    return 1
+  else
+    echo "✅ Hash verified. Running script..."
+    run_pafile
+  fi  
+  else
+    run_pafile
+fi
+
+
+

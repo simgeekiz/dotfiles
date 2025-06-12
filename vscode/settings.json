@@ -1,0 +1,38 @@
+{
+  "typescript.tsc.autoDetect": "off",
+  "eslint.alwaysShowStatus": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript"
+  ],
+  "workbench.preferredDarkColorTheme": "Visual Studio Dark",
+  "workbench.preferredHighContrastColorTheme": "Visual Studio Dark",
+  "workbench.preferredHighContrastLightColorTheme": "Visual Studio Dark",
+  "workbench.preferredLightColorTheme": "Visual Studio Dark",
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+  "git.autofetch": true,
+  "editor.fontFamily": "Menlo, Consolas, DejaVu Sans Mono, monospace",
+  "editor.minimap.autohide": true,
+  "html.format.indentInnerHtml": true,
+  "html.format.indentHandlebars": true,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.formatOnPaste": true,
+  "editor.renderLineHighlight": "none",
+  "editor.renderWhitespace": "boundary",
+  "editor.suggest.showStatusBar": true,
+  "workbench.colorTheme": "Visual Studio Dark",
+  "editor.minimap.enabled": false,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "files.autoSave": "afterDelay",
+  "editor.tabSize": 2,
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.wordWrap": "on",
+  "diffEditor.ignoreTrimWhitespace": false
+}

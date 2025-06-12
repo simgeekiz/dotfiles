@@ -8,6 +8,7 @@
 # License: MIT
 # https://github.com/simgeekiz/dotfiles
 
+# function to install fonts
 function install_fonts() {
   # This script installs custom fonts from a specified source directory to the target font directory.
   echo "🌌 Installing Custom Fonts..."
@@ -64,7 +65,22 @@ function install_fonts() {
   # Open Terminal → Preferences → Profiles → Text, click Change under Font and select MesloLGS NF family.
 }
 
-install_deb() {
+# Function to install powerlevel10k and create a symbolic link
+function install_p10k() {
+  # Install Powerlevel10k
+  echo "🌌 Installing Powerlevel10k..."
+  repo_dir="$HOME/powerlevel10k"
+  if [[ -d "$repo_dir/.git" && -d "$repo_dir" ]]; then
+    echo "🗞️  Powerlevel10k already cloned at $repo_dir"
+  else
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $repo_dir
+  fi
+
+  symlink $HOME/.dotfiles/p10k/.p10k.zsh $HOME/.p10k.zsh
+}
+
+# Function to install a .deb package
+function install_deb() {
   local app="$1"
   local url="$2"
   wget -qO "/tmp/$app.deb" "$url"
@@ -72,219 +88,109 @@ install_deb() {
   rm "/tmp/$app.deb"
 }
 
-install_code() {
+# Function to install Visual Studio Code
+function install_code() {
   local app="$1"
   sudo apt-get install wget gpg
   wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
   sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
   echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" |sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
   rm -f packages.microsoft.gpg
-}
 
-function install_software {
-  # Get operating system
-  unamestr=$(uname)
-  if [[ $unamestr == "Linux" ]]; then
-    printf "🌲 Platform detected as Linux. Installing accordingly."
-    # Update the system
-    echo
-    echo "🔄 Updating system..."
-    sudo apt update && sudo apt upgrade -y
-
-    # Array of packages to install CLI(command line Interface)   # cmake fortune-mod cowsay htop, tree, tmux, vim
-    # "zsh" "vim" "htop" "tree" "jq" "cmake" "fortune-mod" "cowsay" "python-is-python3
-    cli_packages=("git" "python3" "python3-pip" "curl" "tmux" "wget" "build-essential" "gpg")
-
-    for pkg in "${cli_packages[@]}"; do
-      # Check if the package is already installed
-      if dpkg -s "$pkg" >/dev/null 2>&1 || command -v "$pkg" >/dev/null 2>&1; then
-        echo "🐣 $pkg is already installed"
-      else
-        echo "🔨 Installing $pkg"
-        sudo apt install -y "$pkg" || echo "🐥 Unable to install $pkg"
-      fi
-    done
-
-    # Ask the user if they want to install GUI applications
-    echo
-    while true; do
-      printf "🦋 Do you want to install GUI (desktop) applications as well? [Y/n]: "
-      read install_gui
-      install_gui=$(echo "$install_gui" | xargs) # Trim whitespace
-      install_gui=${install_gui:-y}  # set default to 'y' if empty
-
-      case "$install_gui" in
-        y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-          gui_apps=(
-            "google-chrome|deb|https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
-            "code|repo|https://packages.microsoft.com/repos/vscode"
-          )
-
-          for ap in "${gui_apps[@]}"; do
-            IFS="|" read -r name method url <<< "$ap"
-            if command -v "$name" >/dev/null 2>&1; then
-              echo "🏡 $name is already installed"
-            else
-              echo "🔧 Installing $name..."
-              if [[ $name == "code" ]]; then
-                install_code "$name" 
-              else
-                install_deb "$name" "$url"
-              fi
-            fi
-          done
-          break
-          ;;
-        n|N|no|NO|No|nO ) 
-          echo "📝 Skipping GUI apps..."
-          break
-          ;;
-        * )
-          echo "🎸 Please answer yes [y] or no [n]."
-          ;;
-      esac
-    done
-
-    # Ask the user if they want to install Node.js
-    echo
-    while true; do
-      printf "🚀 Do you want to install Node.js? [Y/n]: "
-      read install_node
-      install_node=$(echo "$install_node" | xargs) # Trim whitespace
-      install_node=${install_node:-y}  # set default to 'y' if empty
-
-      case $install_node in
-        y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-          echo "🚀 Installing Node.js..."
-          # Installing Node.js dependencies...
-          npm config set loglevel warn
-          npm install -g npm-upgrade
-          npm install
-          break;;
-        n|N|no|NO|No|nO )
-          echo "🗂️ Skipping Node.js installation..."
-          break;;
-        * )
-          echo "🎸 Please answer yes [y] or no [n]."
-          ;;
-      esac
-    done
-
-    echo "⚙️ Updating & Upgrading & Autoremoving"
-    sudo apt update
-    sudo apt upgrade
-    sudo apt autoremove
-    sudo apt clean
-
-  elif [[ $unamestr == "Darwin" ]]; then
-    printf "🍎 Platform detected as macOS. Installing accordingly."
-
-    # Ask the user if they want to install GUI applications
-    while true; do
-      printf "🦋 Do you want to install GUI (desktop) applications as well? [Y/n]: "
-      read install_gui
-
-      install_gui=$(echo "$install_gui" | xargs) # Trim whitespace
-      install_gui=${install_gui:-y}  # set default to 'y' if empty
-      case "$install_gui" in
-        y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-        echo "☕️ Installing Homebrew dependencies...\n🏡 Setting up GUI apps..."
-        brew bundle install --file="$HOME/.dotfiles/setup/Brewfile"
-        break
-        ;;
-        n|N|no|NO|No|nO ) 
-        # to install only CLI tools (strip cask lines)
-        echo "☕️ Installing Cli tools and libraries... \n📝 Skipping GUI apps..."
-        grep '^brew ' "$HOME/.dotfiles/setup/Brewfile" > "$HOME/.dotfiles/setup/Brewfile.cli"
-        brew bundle install --file="$HOME/.dotfiles/setup/Brewfile.cli"
-        rm "$HOME/.dotfiles/setup/Brewfile.cli"
-        break
-        ;;
-        * )
-        echo "🎸 Please answer yes [y] or no [n]."
-        ;;
-      esac
-    done
-
-    # fzf, fuzzy finder
-    # echo "🌁 Configuring fzf..."
-    # $(brew --prefix)/opt/fzf/install
-    # echo
-
+  # Install extensions
+  if [ -f "$HOME/.dotfiles/vscode/vscode-extensions.txt" ]; then
+    echo "📦 Installing extensions..."
+    xargs -n 1 code --install-extension < "$HOME/.dotfiles/vscode/vscode-extensions.txt"
   else
-    # Unknown or unsupported OS
-    printf "❌ Unsupported platform: $unamestr"
-    exit 1
+    echo "⚠️ No vscode-extensions.txt file found"
   fi
-  
-  # # Ask the user if they want to install Re-volt
-  # echo
-  # while true; do
-  #   printf "🏎️ Do you want to install Re-Volt? [Y/n]: "
-  #   read install_revolt
-  #   install_revolt=$(echo "$install_revolt" | xargs) # Trim whitespace
-  #   install_revolt=${install_revolt:-y}  # set default to 'y' if empty
-    
-  #   case $install_revolt in
-  #     y|Y|yes|YES|Yes|YeS|yEs|YEs) 
-  #       echo "🚙 Installing Re-Volt..."
-  #       # Install Re-Volt
-  #       source $HOME/.dotfiles/revolt/install.zsh
-  #       break;;
-  #     n|N|no|NO|No|nO )
-  #       echo "🗑️ Skipping Re-Volt installation..."
-  #       break;;
-  #     * )
-  #       echo "🎸 Please answer yes [y] or no [n]."
-  #       ;;
-  #   esac
-  # done
+}
+
+# Function to install GUI applications
+function install_gui {
+  gui_apps=(
+    "google-chrome|deb|https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    "code|repo|https://packages.microsoft.com/repos/vscode"
+  )
+
+  for ap in "${gui_apps[@]}"; do
+    IFS="|" read -r name method url <<< "$ap"
+    if command -v "$name" >/dev/null 2>&1; then
+      echo "🏡 $name is already installed"
+    else
+      echo "🔧 Installing $name..."
+      if [[ $name == "code" ]]; then
+        install_code "$name" 
+      else
+        install_deb "$name" "$url"
+      fi
+    fi
+  done
+}
+
+# Function to install Node.js and its dependencies
+function install_nodejs() {
+  echo "🚀 Installing Node.js..."
+  # Installing Node.js dependencies...
+  npm config set loglevel warn
+  npm install -g npm-upgrade
+  npm install
+}
+
+# Function to install CLI tools and update the system
+function install_cli {
+  # Get operating system
+ 
+  echo "🔄 Updating system..."
+  sudo apt update && sudo apt upgrade -y
+
+  # Array of packages to install CLI(command line Interface)   # cmake fortune-mod cowsay htop, tree, tmux, vim
+  # "zsh" "vim" "htop" "tree" "jq" "cmake" "fortune-mod" "cowsay" "python-is-python3
+  cli_packages=("git" "python3" "python3-pip" "curl" "tmux" "wget" "build-essential" "gpg")
+
+  for pkg in "${cli_packages[@]}"; do
+    # Check if the package is already installed
+    if dpkg -s "$pkg" >/dev/null 2>&1 || command -v "$pkg" >/dev/null 2>&1; then
+      echo "🐣 $pkg is already installed"
+    else
+      echo "🔨 Installing $pkg"
+      sudo apt install -y "$pkg" || echo "🐥 Unable to install $pkg"
+    fi
+  done
+
+  echo "⚙️ Updating & Upgrading & Autoremoving"
+  sudo apt update
+  sudo apt upgrade
+  sudo apt autoremove
+  sudo apt clean
 
 }
 
-# Installing custom fonts
-echo
-while true; do
-  printf "🛠️  Do you want to install custom fonts? [Y/n]: "
-  read install_font
-  install_font=$(echo "$install_font" | xargs) # Trim whitespace
-  install_font=${install_font:-y}  # set default to 'y' if empty
+# Ask the user if they want to install custom fonts and powerlevel10k
+prompt_user "🛠️  Do you want to install Powerlevel10k?" "install_fonts && install_p10k" ""
 
-  case "$install_font" in
-    y|Y|yes|YES|Yes|YeS|yEs|YEs)
-      install_fonts
-      break
-      ;;
-    n|N|no|NO|No|nO ) 
-      break
-      ;;
-    * )
-      echo "🎸 Please answer yes [y] or no [n]."
-      ;;
-  esac
-done
+unamestr=$(uname)
+if [[ $unamestr == "Linux" ]]; then
+  printf "🌲 Platform detected as Linux. Installing accordingly."
+  # install any applications or update the system
+  install_cli
+  # Ask the user if they want to install GUI applications
+  prompt_user "🦋 Do you want to install GUI (desktop) applications as well?" install_gui ""
+elif [[ $unamestr == "Darwin" ]]; then
+  printf "🍎 Platform detected as macOS. Installing accordingly."
+  # to install only CLI tools (strip cask lines)
+  prompt_user "🦋 Do you want to install GUI (desktop) applications as well?" \
+  'echo "☕️ Installing Homebrew dependencies... 🏡 Setting up GUI apps..."; brew bundle install --file="$HOME/.dotfiles/setup/Brewfile"' \
+  'echo "☕️ Installing CLI tools and libraries... 📝 Skipping GUI apps..."; grep "^brew " "$HOME/.dotfiles/setup/Brewfile" > "$HOME/.dotfiles/setup/Brewfile.cli"; brew bundle install --file="$HOME/.dotfiles/setup/Brewfile.cli"; rm "$HOME/.dotfiles/setup/Brewfile.cli"'
 
+else
+  # Unknown or unsupported OS
+  printf "❌ Unsupported platform: $unamestr"
+  exit 1
+fi
 
-# Ask the user if they want to install any applications or update the system
-echo
-while true; do
-  printf "🛠️  Do you want to install CLI tools and update the system? [Y/n]: "
-  read install_cli
-  install_cli=$(echo "$install_cli" | xargs) # Trim whitespace
-  install_cli=${install_cli:-y}  # set default to 'y' if empty
+# # Ask the user if they want to install Re-volt
+# prompt_user "🏎️ Do you want to install Re-Volt?" 'echo "🚙 Installing Re-Volt..." && source $HOME/.dotfiles/re-volt/install.zsh' ""
 
-  case "$install_cli" in
-    y|Y|yes|YES|Yes|YeS|yEs|YEs)
-      install_software
-      break
-      ;;
-    n|N|no|NO|No|nO ) 
-      break
-      ;;
-    * )
-      echo "🎸 Please answer yes [y] or no [n]."
-      ;;
-  esac
-done
-
-
+# # Ask the user if they want to install Node.js
+# prompt_user "🚀 Do you want to install Node.js?" install_nodejs ""

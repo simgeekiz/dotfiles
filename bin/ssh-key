@@ -1,0 +1,42 @@
+#!/bin/zsh
+# ---
+# Author: Simge Ekiz
+# ---
+# Prints public SSH key, generates it if necessary adds it to the ssh-agent.
+
+# Usage: ssh-key
+
+SSHDIR="$HOME/.ssh"
+
+# 🔍 Function to check existing SSH public key
+print_existing_ssh_key() {
+  for key_type in rsa ecdsa ed25519; do
+    if [ -f "$SSHDIR/id_${key_type}.pub" ]; then
+      echo "✅ Found SSH key: $SSHDIR/id_${key_type}.pub"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# 🧠 Main logic
+# If no key exists, generate a new one
+if ! print_existing_ssh_key; then
+  echo "🔐 No SSH key found. Generating a new one..."
+  read -p "📧 Enter your email for the SSH key: " EMAIL
+
+  ssh-keygen -t ed25519 -C "$EMAIL" 
+
+  # Start the ssh-agent
+  eval "$(ssh-agent -s)"
+  # Add the new key to the agent
+  ssh-add "$SSHDIR/id_ed25519"
+ 
+  echo "✅ SSH key generated and added to the ssh-agent."
+fi
+
+# Detect the most recent or relevant SSH public key
+PUBKEY=$(find "$HOME/.ssh" -type f -name "*.pub" | grep -E 'id_(ed25519|ecdsa|rsa)\.pub' | head -n 1)
+
+echo "🔑 Your SSH public key is: "
+echo "$(cat $PUBKEY)"

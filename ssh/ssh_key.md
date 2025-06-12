@@ -8,20 +8,6 @@ If you don't already have an SSH key, continue to step generate a new SSH key to
 ### 2. Generating a new SSH key
 
     ssh-keygen -t ed25519 -C "email@example.com"
-  <!--   
-  if [ -d $SSHDIR ]; then
-    if [ -f "$HOME/.ssh/id_rsa.pub" ]; then
-      echo "$HOME/.ssh/id_rsa.pub exists."
-    elif [ -f "$HOME/.ssh/id_ecdsa.pub" ]; then
-      echo "$HOME/.ssh/id_ecdsa.pub exists."
-    elif [ -f "$HOME/.ssh/id_ed25519.pub" ]; then
-      echo "$HOME/.ssh/id_ed25519.pub exists."
-    else
-      echo "Generating a new SSH key"
-      read -p "Please enter the email address you wish to create ssh key? " EMAIL
-      ssh-keygen -t ed25519 -C "$EMAIL"
-    fi 
-  fi  -->
 
 ### 3. Adding your SSH key to the ssh-agent
 

@@ -26,6 +26,8 @@ alias deac='deactivate'
 
 # Interesting Mix
 alias hist='history | grep'
+alias historytime='fc -il 1'
+alias histg='history | grep -i'
 alias please='sudo'
 
 # Git aliases
@@ -74,9 +76,6 @@ alias gaddremote='f() { git remote add "$1" "$2" }; f'
 # VSCODE
 alias editdotfiles='code $HOME/.dotfiles'
 
-# headphone work
-alias turnonheadphones='curl https://gitlab.freedesktop.org/pulseaudio/pulseaudio/raw/master/src/utils/pa-info?inline=false | bash | nc termbin.com 9999'
-
 # nvidia-prime Control
 alias nvidia='sudo prime-select nvidia'
 
@@ -103,7 +102,6 @@ alias td='tmux detach'
 alias tdetach='tmux detach'
 # alias tkallbc='tmux kill-session -a'
 # (ctrl+b) + :kill-session
-
 
 # Jekkyl
 alias js='jekyll serve'
@@ -159,6 +157,7 @@ alias ka9='killall -9'
 alias k9='kill -9'
 
 alias restartterminal='exec $SHELL'
+alias reload='exec $SHELL'
 
 # Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
