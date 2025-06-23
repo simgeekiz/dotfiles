@@ -25,7 +25,7 @@ fi
 files=(.zshrc .zsh_aliases .zprofile)
 
 for file in $files; do
-  backup "$HOME/$file" # Backup existing file if it exists and is not a symlink
+  backup_file "$HOME/$file" # Backup existing file if it exists and is not a symlink
   fullpath="$HOME/$file"
   symlink $HOME/.dotfiles/zsh/$file $fullpath
 done
@@ -38,15 +38,26 @@ if [[ -d "$repo_dir/.git" && -d "$repo_dir" ]]; then
 fi
 
 # Symlink VS Code settings and keybindings to the present `settings.json` and `keybindings.json` files
-if [[ $(uname) == "Linux" ]]; then
-  CODE_PATH="$HOME/.config/Code/User"
-  # If this folder doesn't exist, it's a WSL
-  if [ ! -e $CODE_PATH ]; then
-    CODE_PATH="$HOME/.vscode-server/data/Machine"
-  fi
-elif [[ $(uname) == "Darwin" ]]; then
-   CODE_PATH="$HOME/Library/Application Support/Code/User"
-fi
+case "$(uname)" in
+  Darwin)
+    CODE_PATH="$HOME/Library/Application Support/Code/User"
+    ;;
+  Linux)
+    CODE_PATH="$HOME/.config/Code/User"
+    # If this folder doesn't exist, it's a WSL
+    if [ ! -e $CODE_PATH ]; then
+      CODE_PATH="$HOME/.vscode-server/data/Machine"
+    fi
+    ;;
+  FreeBSD)
+    echo "FreeBSD"
+    ;;
+  *)
+    echo "Unsupported OS: $(uname)"
+    echo "Please check if you are running this on a supported OS (Linux or macOS)."
+    exit 0
+    ;;
+esac
 
 if [ -d "$CODE_PATH" ] && command -v code >/dev/null 2>&1; then
   symlink $HOME/.dotfiles/vscode/settings.json $CODE_PATH/settings.json

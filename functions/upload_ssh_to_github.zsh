@@ -23,16 +23,20 @@ check_GitHub_CLI() {
   # Uploads your SSH public key to your GitHub account with a descriptive title.
   # Confirm GitHub CLI is installed
   if ! command -v gh >/dev/null 2>&1; then
-    if [[ $(uname) == "Darwin" ]]; then
-      echo "🍏 GitHub CLI not found. Installing with Homebrew..."
-      brew install gh
-    elif [[ $(uname) == "Linux" ]]; then
-      echo "🐧 GitHub CLI not found. Installing with apt..."
-      sudo apt update && sudo apt install -y gh
-    else
-      echo "❗ Unsupported OS for GitHub CLI installation. Please install it manually."
-      exit 1
-    fi
+    case "$(uname)" in
+      Darwin)
+        echo "🍏 GitHub CLI not found. Installing with Homebrew..."
+        brew install gh
+        ;;
+      Linux)
+        echo "🐧 GitHub CLI not found. Installing with apt..."
+        sudo apt update && sudo apt install -y gh
+        ;;
+      *)
+        echo "❗ Unsupported OS for GitHub CLI installation. Please install it manually."
+        exit 1
+        ;;
+    esac
   else
     echo "✅ GitHub CLI is already installed: $(gh --version)"
   fi 

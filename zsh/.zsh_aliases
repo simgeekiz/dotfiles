@@ -1,18 +1,3 @@
-function with_cat() {
-  # Run any command passed in
-  "$@"
-  echo "
-     /\\_/\\
-    ( o.o )
-     > v <
-  ------------"
-}
-
-function ls() {
-  command ls --color "$@"  # runs the real `ls`, bypassing your custom function
-  with_cat
-}
-
 # Python
 alias python='python3.10'
 alias python=python3
@@ -133,7 +118,10 @@ alias ~='cd ~'
 alias cddot='cd $HOME/.dotfiles'
 alias cdwork='cd $HOME/workspaces/'
 
-# ls and ls color, easy report
+alias realrm="/bin/rm"
+alias realls="/bin/ls"
+
+# ls and easy report
 alias ll='ls -al'
 alias la='ls -A'
 alias lla='ls -lah'
@@ -143,7 +131,7 @@ alias lsa='ls -lah'
 alias lsg='ll | grep'
 alias lll='ls -alF'
 alias l='ls -CF'
-alias grep='grep --color=auto'
+
 alias fdir='find . -type d -name'
 alias ff='find . -type f -name'
 

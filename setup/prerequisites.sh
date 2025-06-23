@@ -13,82 +13,90 @@ set -e
 cd $HOME
 
 # Get operating system
-if [[ $(uname) == "Linux" ]]; then
-  echo '🌲 Platform detected as Linux. Installing accordingly.'
-  # Install Git (if it is not already installed)
-  if ! command -v git >/dev/null 2>&1; then
-    echo "🔧 Installing git"
-    if [ -f /etc/debian_version ]; then
-      sudo apt update && sudo apt install -y git
-    elif [ -f /etc/redhat-release ]; then
-      if command -v dnf >/dev/null 2>&1; then
-        sudo dnf install -y git
-      else
-        sudo yum install -y git
-      fi
-    elif [ -f /etc/arch-release ]; then
-      sudo pacman -Sy --noconfirm git
+case "$(uname)" in
+  Darwin)
+    # macOS
+    echo '🍏 Platform detected as macOS.🍎 Installing accordingly.'
+    # Install Homebrew if it is not already installed
+    if ! command -v brew > /dev/null 2>&1; then
+      echo "🫖 Installing Homebrew..."
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+      eval "$(/opt/homebrew/bin/brew shellenv)"
     else
-      echo "❌ Unsupported Linux distro"
-      exit 0
+      echo "🫖 Homebrew already installed..."
     fi
-  else
-    echo "✅ Git is already installed: $(git --version)"
-  fi
-  
-  # Install Zsh (if not already installed)
-  if ! command -v zsh >/dev/null 2>&1; then
-    echo "🌸 Zsh not found. Attempting to install..."
-    if [ -f /etc/debian_version ]; then
-      sudo apt install -y zsh
-    elif [ -f /etc/redhat-release ]; then
-      if command -v dnf >/dev/null 2>&1; then
-        sudo dnf install -y zsh
-      else
-        sudo yum install -y zsh
-      fi
-    elif [ -f /etc/arch-release ]; then
-      sudo pacman -Sy --noconfirm zsh
+
+    # verify the installation
+    echo $(brew --version)
+    
+    # Install Zsh (If zsh not already installed)
+    if ! command -v zsh >/dev/null 2>&1; then
+      echo "🌸 Zsh not found. Installing with Homebrew..."
+      brew install zsh
     else
-      echo "❌ Unsupported Linux distro. Install Zsh manually."
-      exit 0
+      echo "✅ Zsh already installed: $(zsh --version)"
     fi
-  else
-    echo "✅ Zsh already installed: $(zsh --version)"
-  fi
 
-elif [[ $(uname) == "Darwin" ]]; then
-  echo '🍏 Platform detected as macOS.🍎 Installing accordingly.'
-  
-  # Install Homebrew if it is not already installed
-  if ! command -v brew > /dev/null 2>&1; then
-    echo "🫖 Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  else
-    echo "🫖 Homebrew already installed..."
-  fi
-
-  # verify the installation
-  echo $(brew --version)
-  
-  # Install Zsh (If zsh not already installed)
-  if ! command -v zsh >/dev/null 2>&1; then
-    echo "🌸 Zsh not found. Installing with Homebrew..."
-    brew install zsh
-  else
-    echo "✅ Zsh already installed: $(zsh --version)"
-  fi
-
-  # Install Git (if not already installed)
-  if ! command -v git >/dev/null 2>&1; then
-    echo "🌱 Git not found. Installing with Homebrew..."
-    brew install git
-  else
-    echo "✅ Git already installed: $(git --version)"
-  fi
-fi
+    # Install Git (if not already installed)
+    if ! command -v git >/dev/null 2>&1; then
+      echo "🌱 Git not found. Installing with Homebrew..."
+      brew install git
+    else
+      echo "✅ Git already installed: $(git --version)"
+    fi
+    ;;
+  Linux)
+    # Linux
+    echo '🌲 Platform detected as Linux. Installing accordingly.'
+    # Install Git (if it is not already installed)
+    if ! command -v git >/dev/null 2>&1; then
+      echo "🔧 Installing git"
+      if [ -f /etc/debian_version ]; then
+        sudo apt update && sudo apt install -y git
+      elif [ -f /etc/redhat-release ]; then
+        if command -v dnf >/dev/null 2>&1; then
+          sudo dnf install -y git
+        else
+          sudo yum install -y git
+        fi
+      elif [ -f /etc/arch-release ]; then
+        sudo pacman -Sy --noconfirm git
+      else
+        echo "❌ Unsupported Linux distro"
+        exit 0
+      fi
+    else
+      echo "✅ Git is already installed: $(git --version)"
+    fi
+    
+    # Install Zsh (if not already installed)
+    if ! command -v zsh >/dev/null 2>&1; then
+      echo "🌸 Zsh not found. Attempting to install..."
+      if [ -f /etc/debian_version ]; then
+        sudo apt install -y zsh
+      elif [ -f /etc/redhat-release ]; then
+        if command -v dnf >/dev/null 2>&1; then
+          sudo dnf install -y zsh
+        else
+          sudo yum install -y zsh
+        fi
+      elif [ -f /etc/arch-release ]; then
+        sudo pacman -Sy --noconfirm zsh
+      else
+        echo "❌ Unsupported Linux distro. Install Zsh manually."
+        exit 0
+      fi
+    else
+      echo "✅ Zsh already installed: $(zsh --version)"
+    fi
+    ;;
+  *)
+    echo "❌ Unsupported OS: $(uname)"
+    echo "❗ Please check if you are running this on a supported OS (Linux or macOS)."
+    exit 0
+    ;;
+esac
 
 # Check if the shell is Zsh
 if [ -n "$ZSH_VERSION" ]; then 
@@ -115,7 +123,8 @@ else
   exec /bin/zsh
 fi
 
-bin/zsh .dotfiles/generic/upload_ssh_to_github.zsh
+curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/functions/upload_ssh_to_github.zsh
+[ -x /bin/zsh ] && /bin/zsh upload_ssh_to_github.zsh || bash upload_ssh_to_github.zsh
 
 # # Check if the .dotfiles directory exists
 if [[ -d "$HOME/.dotfiles" && -d "$HOME/.dotfiles/.git" ]]; then

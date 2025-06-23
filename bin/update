@@ -35,14 +35,22 @@ autoremove() {
   sudo apt clean
 }
 
-if $(uname | grep -q "Linux"); then
-  update_and_upgrade
-  autoremove
-elif $(uname | grep -q "Darwin"); then
-  # Make sure we’re using the latest Homebrew.
-  brew update
-  # Upgrade any already-installed formulae.
-  brew upgrade
-  
-fi
+case "$(uname)" in
+  Darwin)
+    # Make sure we’re using the latest Homebrew.
+    brew update
+    # Upgrade any already-installed formulae.
+    brew upgrade
+    ;;
+  Linux)
+    echo "Linux"
+    update_and_upgrade
+    autoremove
+    ;;
+  *)
+    echo "❌ Unsupported OS: $(uname)"
+    echo "❗ Please check if you are running this on a supported OS (Linux or macOS)."
+    exit 0
+    ;;
+esac
 

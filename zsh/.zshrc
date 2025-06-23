@@ -19,31 +19,31 @@ promptinit
 PS1='%B%n@%m %~ %#%b '
 
 # Load configs
+
+export SHOW_CAT="true"
+# === Import functions ===
+[[ -f "$HOME/.dotfiles/functions/interactive.zsh" ]] && source "$HOME/.dotfiles/functions/interactive.zsh"
+[[ -f "$HOME/.dotfiles/functions/core.zsh" ]] && source "$HOME/.dotfiles/functions/core.zsh"
+
 ### Aliases ###
-if [ -f $HOME/.zsh_aliases ]; then
-    source $HOME/.zsh_aliases
-fi
+[[ -f $HOME/.zsh_aliases ]] && source $HOME/.zsh_aliases
+
 ### Completion ###
 
 # Uncomment the following line to use case-sensitive completion.
-CASE_SENSITIVE="true"
+export CASE_SENSITIVE="true"
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE="true"
+export HYPHEN_INSENSITIVE="true"
 
-if [ -f $HOME/.dotfiles/zsh/completion.zsh ]; then
-    source $HOME/.dotfiles/zsh/completion.zsh
-fi
+[[ -f $HOME/.dotfiles/zsh/completion.zsh ]] && source $HOME/.dotfiles/zsh/completion.zsh
 
 ### Key Bindings ###
-if [ -f $HOME/.dotfiles/zsh/key-bindings.zsh ]; then
-    source $HOME/.dotfiles/zsh/key-bindings.zsh
-fi
+[[ -f "$HOME/.dotfiles/zsh/key-bindings.zsh" ]] && source "$HOME/.dotfiles/zsh/key-bindings.zsh"
+
 
 ### Config ###
-if [ -f $HOME/.dotfiles/zsh/config.zsh ]; then
-    source $HOME/.dotfiles/zsh/config.zsh
-fi
+[[ -f $HOME/.dotfiles/zsh/config.zsh ]] && source $HOME/.dotfiles/zsh/config.zsh
 
 ### Fortune and Cowsay ###
 # # Get list of cowsay animals as array
@@ -55,9 +55,7 @@ fi
 
 
 ### Load the ascii art. ###
-if [ -f $HOME/.dotfiles/asciiart/asciiart.rc ]; then
-    source $HOME/.dotfiles/asciiart/asciiart.rc
-fi
+[[ -f $HOME/.dotfiles/asciiart/asciiart.rc ]] && source $HOME/.dotfiles/asciiart/asciiart.rc
 
 ### Add custom bin directory to PATH ###
 if [ -d $HOME/.dotfiles/bin ]; then

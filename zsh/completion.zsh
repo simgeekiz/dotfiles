@@ -23,8 +23,8 @@ setopt NO_COMPLETE_ALIASES
 
 # enables interactive menu selection with arrow keys
 zstyle ':completion:*' menu select
-# use the same color scheme for completions as your terminal uses for ls.
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+# set completion colors to be the same as `ls`, if available
+[[ -z "$LS_COLORS" ]] || zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # # Group results by category
 # zstyle ':completion:*' group-name ''

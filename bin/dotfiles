@@ -1,0 +1,73 @@
+#!/usr/bin/env zsh
+# ---
+# Author: Simge Ekiz
+# ---
+# Pull from repository and check symlinks and the installation
+#  
+# Usage:  dotfiles 
+#
+
+# Exit on any failed command
+set -e
+
+# === Parse Arguments ===
+INSTALL=false
+local script_name="${0##*/}"
+
+# Print usage message.
+usage() {
+  cat <<EOF
+    Usage: $script_name [- options]
+
+    Options:
+      --help, -h       Show this help message
+      --install, -i    Run installation scripts
+EOF
+}
+
+# === Parse arguments ===
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --help | -h | -help)
+      usage
+      exit 0
+      ;;
+    --install | -i | -install)
+      INSTALL=true
+      ;;
+    *)
+      echo "❌ Unknown option: $1"
+      usage
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# === Ensure we're in ~/.dotfiles ===
+cd "$HOME/.dotfiles" > /dev/null 2>&1 || {
+  echo "❌ Cannot find ~/.dotfiles directory."
+  exit 1
+}
+echo "✒️ Pulling changes from GitHub..."
+git pull
+
+# # === Import functions ===
+if [[ -f "$HOME/.dotfiles/functions/core.zsh" ]]; then
+  source "$HOME/.dotfiles/functions/core.zsh"
+fi
+
+# === Optional: Install software ===
+if [[ "$INSTALL" == true ]]; then
+  if [[ -f "$HOME/.dotfiles/setup/install.zsh" ]]; then
+    source "$HOME/.dotfiles/setup/install.zsh"
+  fi
+fi
+
+# === Symlink dotfiles ===
+[[ -f "$HOME/.dotfiles/setup/symlink.zsh" ]] && source "$HOME/.dotfiles/setup/symlink.zsh"
+
+cd $HOME
+
+echo "🦆 Restarting Terminal"  
+exec $SHELL

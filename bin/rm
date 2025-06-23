@@ -14,29 +14,46 @@
 # Usage:  rm [options] <file1> <file2> ...
 
 has_dir=0
+# initialize both arrays explicitly
+args=()
+files=()
 
-for item in "$@"; do
-  if [ -d "$item" ]; then
-    has_dir=1
-    break
-  fi
+# Separate flags and file args
+for arg in "$@"; do
+  # args+=("$arg")
+   # Skip flags when checking for directories(skip flags like -f, -r, etc.)
+  [[ "$arg" == -* ]] && continue
+  # add only actual file/dir arguments
+  files+=("$arg")  
+  # Check if the argument is a directory
+  [[ -d "$arg" ]] && has_dir=1
 done
+
+# If no valid args remain, exit
+if [[ ${#files[@]} -eq 0 ]]; then
+  echo "\e[31m[Error]\e[0m No valid files or directories to delete."
+  exit 1
+fi
 
 if [ $has_dir -eq 1 ]; then
   echo -e "\e[31m[Warning]\e[0m You are about to delete a directory!"
 fi
 
-echo -n "Are you sure you want to delete: "
-for item in "$@"; do
-  echo -n "\"$item\" "
+while true; do
+  echo -n "Are you sure you want to delete: "
+  printf '"%s" ' "${files[@]}"
+  echo -n "? (y/n) "
+  read -r answer
+
+  case "$answer" in
+    [Yy]|[Yy][Ee][Ss])
+      echo -e "\e[32mDeleting...\e[0m"
+      # /bin/rm "${args[@]}"
+      /bin/rm "$@"
+      break ;;
+    [Nn]|[Nn][Oo])
+      echo -e "\e[32mAborted.\e[0m"
+      break ;;
+    *) echo "Please answer yes or no." ;;
+  esac
 done
-echo -n "? (y/n) "
-
-read -r answer
-if [[ "$answer" == [Yy]* ]]; then
-  command rm -rf "$@"
-else
-  echo -e "\e[32mAborted.\e[0m"
-fi
-
-

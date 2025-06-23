@@ -15,7 +15,7 @@ symlink() {
   fi
 }
 
-backup() {
+backup_file() {
   local source_file="$1"
 
   # note -e → Checks if the file or directory exists, regardless of type.
@@ -34,7 +34,7 @@ backup() {
   fi
 }
 
-printlog () {
+print_log () {
     echo
     echo "---------------------------------------------------------------------------" >&2
     echo "$1"
@@ -61,3 +61,10 @@ prompt_user() {
     esac
   done
 }
+
+function add_to_path() {
+  if [[ ":$PATH:" != *":$1:"* ]]; then
+    export PATH="$1:$PATH"
+  fi
+}
+
