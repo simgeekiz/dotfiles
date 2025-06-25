@@ -32,7 +32,6 @@ done
 echo  "###############################################################################################"
 echo
 
-# exit 0
 # Print standard ANSI colors (0-7 normal and 8-15 bright)
 # the basic ANSI color system includes 16 colors, consisting of:
 # 8 standard colors (0–7)

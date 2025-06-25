@@ -64,7 +64,7 @@ case "$(uname)" in
         sudo pacman -Sy --noconfirm git
       else
         echo "❌ Unsupported Linux distro"
-        exit 0
+        exit 1
       fi
     else
       echo "✅ Git is already installed: $(git --version)"
@@ -85,7 +85,7 @@ case "$(uname)" in
         sudo pacman -Sy --noconfirm zsh
       else
         echo "❌ Unsupported Linux distro. Install Zsh manually."
-        exit 0
+        exit 1
       fi
     else
       echo "✅ Zsh already installed: $(zsh --version)"
@@ -94,7 +94,7 @@ case "$(uname)" in
   *)
     echo "❌ Unsupported OS: $(uname)"
     echo "❗ Please check if you are running this on a supported OS (Linux or macOS)."
-    exit 0
+    exit 1
     ;;
 esac
 

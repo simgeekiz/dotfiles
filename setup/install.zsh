@@ -187,7 +187,7 @@ case "$(uname)" in
   *)
     echo "❌ Unsupported OS: $(uname)"
     echo "❗ Please check if you are running this on a supported OS (Linux or macOS)."
-    exit 0
+    exit 1
     ;;
 esac
 
