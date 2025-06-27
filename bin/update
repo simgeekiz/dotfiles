@@ -16,7 +16,6 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
-
 update_and_upgrade() {
   echo "${magenta}⚙️ Updating Package List...${white}"
   sudo apt update
@@ -24,8 +23,6 @@ update_and_upgrade() {
   echo -e "${magenta}⬆️ Upgrading System Packages (full-upgrade)...${white}"
   sudo apt full-upgrade -y
 }
-
-echo "${magenta}Updating and Upgrading System Packages.\nThis may take a while, please be patient...${white}"
 
 # Autoremove unnecessary packages. Clean up the local repository of retrieved package files.
 autoremove() {
@@ -43,7 +40,6 @@ case "$(uname)" in
     brew upgrade
     ;;
   Linux)
-    echo "Linux"
     update_and_upgrade
     autoremove
     ;;

@@ -169,15 +169,15 @@ function install_cli {
 # Ask the user if they want to install custom fonts and powerlevel10k
 prompt_user "🛠️  Do you want to install Powerlevel10k?" "install_fonts && install_p10k" ""
 
-case "$(uname)" in
-  Darwin)
+case "$(uname -s)" in
+  Darwin*)
     printf "🍎 Platform detected as macOS. Installing accordingly."
     # to install only CLI tools (strip cask lines)
     prompt_user "🦋 Do you want to install GUI (desktop) applications as well?" \
     'echo "☕️ Installing Homebrew dependencies... 🏡 Setting up GUI apps..."; brew bundle install --file="$HOME/.dotfiles/setup/Brewfile"' \
     'echo "☕️ Installing CLI tools and libraries... 📝 Skipping GUI apps..."; grep "^brew " "$HOME/.dotfiles/setup/Brewfile" > "$HOME/.dotfiles/setup/Brewfile.cli"; brew bundle install --file="$HOME/.dotfiles/setup/Brewfile.cli"; rm "$HOME/.dotfiles/setup/Brewfile.cli"'
     ;;
-  Linux)
+  Linux*)
     printf "🌲 Platform detected as Linux. Installing accordingly."
     # install any applications or update the system
     install_cli

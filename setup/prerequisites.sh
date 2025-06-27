@@ -13,8 +13,8 @@ set -e
 cd $HOME
 
 # Get operating system
-case "$(uname)" in
-  Darwin)
+case "$(uname -s)" in
+  Darwin*)
     # macOS
     echo '🍏 Platform detected as macOS.🍎 Installing accordingly.'
     # Install Homebrew if it is not already installed
@@ -46,7 +46,7 @@ case "$(uname)" in
       echo "✅ Git already installed: $(git --version)"
     fi
     ;;
-  Linux)
+  Linux*)
     # Linux
     echo '🌲 Platform detected as Linux. Installing accordingly.'
     # Install Git (if it is not already installed)

@@ -19,13 +19,13 @@ fi
 
 clean_trash() {
   echo "🗑️ Cleaning system Trash..."
-  case "$(uname)" in
-    Darwin)
+  case "$(uname -s)" in
+    Darwin*)
       sudo rm -rf ~/.Trash/*
       sudo rm -rf /Volumes/*/.Trashes/*
       sudo rm -rf /private/var/log/asl/*.asl
       ;;
-    Linux)
+    Linux*)
       sudo rm -rf "$HOME/.local/share/Trash/"* 2>/dev/null || true
       # sudo rm -rf /root/.local/share/Trash/* 2>/dev/null || true
       ;;

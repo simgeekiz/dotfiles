@@ -37,30 +37,46 @@ if [[ -d "$repo_dir/.git" && -d "$repo_dir" ]]; then
   symlink $HOME/.dotfiles/p10k/.p10k.zsh $HOME/.p10k.zsh
 fi
 
-# Symlink VS Code settings and keybindings to the present `settings.json` and `keybindings.json` files
-case "$(uname)" in
-  Darwin)
-    CODE_PATH="$HOME/Library/Application Support/Code/User"
-    ;;
-  Linux)
-    CODE_PATH="$HOME/.config/Code/User"
-    # If this folder doesn't exist, it's a WSL
-    if [ ! -e $CODE_PATH ]; then
-      CODE_PATH="$HOME/.vscode-server/data/Machine"
-    fi
-    ;;
-  FreeBSD)
-    echo "FreeBSD"
-    ;;
-  *)
-    echo "Unsupported OS: $(uname)"
-    echo "Please check if you are running this on a supported OS (Linux or macOS)."
-    exit 1
-    ;;
-esac
 
-if [ -d "$CODE_PATH" ] && command -v code >/dev/null 2>&1; then
-  symlink $HOME/.dotfiles/vscode/settings.json $CODE_PATH/settings.json
+# VSCODE 
+# bootstrap VS Code on macOS, Linux, WSL, or VS Code Server
+#   • Symlinks settings.json and keybindings.json from ~/.dotfiles/vscode
+#   • Installs extensions from ~/.dotfiles/vscode/extensions.txt
+if command -v code >/dev/null 2>&1 || command -v code-insiders >/dev/null 2>&1; then
+  # Symlink VS Code settings and keybindings to the present `settings.json` and `keybindings.json` files
+  case "$(uname -s)" in
+    Darwin*)
+      CODE_PATH="$HOME/Library/Application Support/Code/User"
+      ;;
+    Linux*)
+      CODE_PATH="$HOME/.config/Code/User"
+      # If this folder doesn't exist, it's a WSL
+      if [ ! -d "$CODE_PATH" ]; then
+        CODE_PATH="$HOME/.vscode-server/data/Machine"
+      fi
+      ;;
+    *)
+      echo "Unsupported OS: $(uname)"
+      echo "Please check if you are running this on a supported OS (Linux or macOS)."
+      exit 1
+      ;;
+  esac
+
+  mkdir -p "$CODE_PATH"
+  symlink "$HOME/.dotfiles/vscode/settings.json" "$CODE_PATH/settings.json"
+  symlink "$HOME/.dotfiles/vscode/keybindings.json" "$CODE_PATH/keybindings.json"
+
+  CODE_CMD=$(command -v code || command -v code-insiders)
+  EXT_FILE="$HOME/.dotfiles/vscode/vscode-extensions.txt"
+  if [ -f "$EXT_FILE" ]; then
+    echo "📦  Installing extensions from $EXT_FILE ..."
+    grep -vE '^\s*$|^\s*#' "$EXT_FILE" | while read -r ext; do
+      "$CODE_CMD" --install-extension "$ext" --force
+    done
+    echo "✅  Extensions installed."
+  else
+    echo "ℹ️  No extensions.txt found – skipping extension install."
+  fi
 fi
 
 # Autostart

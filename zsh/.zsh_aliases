@@ -75,17 +75,23 @@ killscr () {
 }
 
 # Tmux Control
+# start a new tmux session
 alias tmuxnew='tmux new'
 alias tn='tmux new'
 alias tnt='tmux new -t'
+alias tns='tmux new -s'
+# attach to an existing tmux session
 alias ta='tmux a'
 alias tat='tmux a -t'
-alias tls='tmux ls'
-alias tkt='tmux kill-ses -t'
 alias tattach='tmux attach'
+# detach from a tmux session
 alias td='tmux detach'
 alias tdetach='tmux detach'
-# alias tkallbc='tmux kill-session -a'
+# list all tmux sessions
+alias tls='tmux ls'
+# kill a tmux session
+alias tkt='tmux kill-ses -t'
+alias tkill='tmux kill-session -t'
 # (ctrl+b) + :kill-session
 
 # Jekkyl

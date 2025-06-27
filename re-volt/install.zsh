@@ -14,13 +14,13 @@ fi
 # Get operating system
 revolt_launcher_link="unknown"
 
-case "$(uname)" in
-  Darwin)
+case "$(uname -s)" in
+  Darwin*)
     revolt_launcher_link="https://rvgl.org/downloads/rvgl_launcher_macos.zip"
     revolt_zip="$REVOLTDIR/rvgl_launcher_macos.zip"
     revolt_launcher_file="$REVOLTDIR/RVGL Launcher.app"
     ;;
-  Linux)
+  Linux*)
     revolt_launcher_link="https://rvgl.org/downloads/rvgl_launcher_linux.zip"
     revolt_zip="$REVOLTDIR/rvgl_launcher_linux.zip"
     revolt_launcher_file="$REVOLTDIR/rvgl_launcher.py"
@@ -38,8 +38,8 @@ if [ ! -f $revolt_zip ]; then
   unzip $REVOLTDIR/rvgl*.zip -d $REVOLTDIR
 fi
 
-case "$(uname)" in
-  Darwin)
+case "$(uname -s)" in
+  Darwin*)
     if [ ! -d "$revolt_launcher_file" ]; then
       if [ -f $revolt_zip ]; then
         unzip $REVOLTDIR/rvgl*.zip -d $REVOLTDIR
@@ -51,7 +51,7 @@ case "$(uname)" in
     mv $HOME/Games/Re-Volt/RVGL\ Launcher.app /Applications/RVGL\ Launcher.app
     rm -r $HOME/Games/Re-Volt
     ;;
-  Linux)
+  Linux*)
     if [ ! -f $revolt_launcher_file ]; then
       if [ -f $revolt_zip]; then
         unzip $REVOLTDIR/rvgl*.zip -d $REVOLTDIR

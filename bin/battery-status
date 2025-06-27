@@ -14,8 +14,8 @@ ORANGE="\033[38;5;214m"
 YELLOW="\033[33m"
 RESET="\033[0m"
 
-case "$(uname)" in
-  Darwin)
+case "$(uname -s)" in
+  Darwin*)
     # Check if pmset command is available
     if ! command -v pmset &> /dev/null; then
       echo "❗ pmset command not found. Please ensure you are running this on a macOS system."
@@ -61,7 +61,7 @@ case "$(uname)" in
     echo "$ac_status - $charging_status (${color} $battery_capacity ${RESET}) - $time_remaining"
 
     ;;
-  Linux)
+  Linux*)
     # Check if the battery and AC paths exist 
     BAT_PATH="/sys/class/power_supply/BAT0"
     AC_PATH="/sys/class/power_supply/AC"

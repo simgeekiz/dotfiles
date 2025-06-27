@@ -50,12 +50,12 @@ fi
 
 # Set up ls colors and alias based on the platform
 
-case "$(uname)" in
-  Darwin)
+case "$(uname -s)" in
+  Darwin*)
     # Default coloring for BSD-based ls # macOS / BSD 
     export LSCOLORS="ExFxCxDxBxegedabagacad"
     ;;
-  Linux)
+  Linux*)
     # Default coloring for GNU-based ls
     if [[ -z "$LS_COLORS" ]]; then
       # Define LS_COLORS via dircolors if available. Otherwise, set a default
