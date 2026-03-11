@@ -23,10 +23,10 @@ zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 
 # Bind arrow keys (both modes)
-bindkey '^[[A' up-line-or-beginning-search  # Normal mode
-bindkey '^[OA' up-line-or-beginning-search   # Application mode
-bindkey '^[[B' down-line-or-beginning-search  # Normal mode
-bindkey '^[OB' down-line-or-beginning-search  # Application mode
+bindkey '^[[A' up-line-or-beginning-search  # Up arrow Normal mode
+bindkey '^[OA' up-line-or-beginning-search   # Up arrow Application mode
+bindkey '^[[B' down-line-or-beginning-search  # Down arrow Normal mode
+bindkey '^[OB' down-line-or-beginning-search  # Down arrow Application mode
 
 bindkey '^[[1;3D' backward-word # Alt + ←
 bindkey '^[[1;3C' forward-word # Alt + →

@@ -22,20 +22,20 @@ fi
 # symlink $HOME/.dotfiles/guake/guake.conf $HOME/.config/guake/guake.conf
 
 # List of config files to check
-files=(.zshrc .zsh_aliases .zprofile)
+files=(zshrc zprofile)
 
 for file in $files; do
-  backup_file "$HOME/$file" # Backup existing file if it exists and is not a symlink
-  fullpath="$HOME/$file"
-  symlink $HOME/.dotfiles/zsh/$file $fullpath
+  # Backup existing home file if it exists and is not a symlink
+  backup_file "$HOME/.$file" # Backup existing file if it exists and is not a symlink
+  symlink $HOME/.dotfiles/zsh/$file "$HOME/.$file"
 done
 
 # POWERLEVEL10K
-repo_dir="$HOME/powerlevel10k"
-if [[ -d "$repo_dir/.git" && -d "$repo_dir" ]]; then
-  # echo "🗞️  Powerlevel10k already cloned at $repo_dir"
-  symlink $HOME/.dotfiles/p10k/.p10k.zsh $HOME/.p10k.zsh
-fi
+### repo_dir="$HOME/powerlevel10k"
+### if [[ -d "$repo_dir/.git" && -d "$repo_dir" ]]; then
+### # echo "🗞️  Powerlevel10k already cloned at $repo_dir"
+###  symlink $HOME/.dotfiles/p10k/.p10k.zsh $HOME/.p10k.zsh
+### fi
 
 
 # VSCODE 

@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+# ---
+# Author: Simge Ekiz
+# ---
+# File: ~/.dotfiles/bin/apt-clean
+# Clean Debian packages
+# 
+# Usage: apt-clean
+
+sudo apt-get clean
+sudo apt-get autoclean
+sudo apt-get autoremove

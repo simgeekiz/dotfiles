@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+# Show the current weather
+location="${1:-}"
+
+print "🌞 Fetching weather for ${location:-your location}..."
+
+if [[ -z "$location" ]]; then
+  raw=$(curl -s "wttr.in?format=%l|%c|%C|%t|%w|%m")
+else
+  raw=$(curl -s "wttr.in/${location// /+}?format=%l|%c|%C|%t|%w|%m")
+fi
+
+IFS="|" read -r city emoji desc temp wind moon <<< "$raw"
+
+print -P "Today: %B%F{green}${city}%f%b: ${emoji}%F{214}(${desc})%f %F{red}${temp}%f %F{cyan}${wind}%f %F{yellow}Moon:${moon}%f"
+
+### --- Notes
+  # %B  -> start bold text
+  # %b  -> end bold text
+  # ${cyan}, ${blue}, ${green}, ${red}, ${yellow}, ${orange}, ${white}, ${reset}
+  # ${reset} clears the color.
+  # ${bold} works for bold text.
+  # ${fg[cyan]} is also valid if you want the fg[] syntax.

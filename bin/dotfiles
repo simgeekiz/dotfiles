@@ -59,13 +59,13 @@ fi
 
 # === Optional: Install software ===
 if [[ "$INSTALL" == true ]]; then
-  if [[ -f "$HOME/.dotfiles/setup/install.zsh" ]]; then
-    source "$HOME/.dotfiles/setup/install.zsh"
+  if [[ -f "$HOME/.dotfiles/scripts/install.zsh" ]]; then
+    source "$HOME/.dotfiles/scripts/install.zsh"
   fi
 fi
 
 # === Symlink dotfiles ===
-[[ -f "$HOME/.dotfiles/setup/symlink.zsh" ]] && source "$HOME/.dotfiles/setup/symlink.zsh"
+[[ -f "$HOME/.dotfiles/scripts/symlink.zsh" ]] && source "$HOME/.dotfiles/scripts/symlink.zsh"
 
 cd $HOME
 

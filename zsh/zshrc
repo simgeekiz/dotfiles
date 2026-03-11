@@ -1,0 +1,66 @@
+# ~/.dotfiles/zsh/.zshrc
+
+### === Load modular Zsh setup === ###
+
+# Source .zprofile first (optional, for non-login shells)
+[[ -f $HOME/.dotfiles/zsh/zprofile ]] && source $HOME/.dotfiles/zsh/zprofile
+
+# Load Config
+[[ -f $HOME/.dotfiles/zsh/config.zsh ]] && source $HOME/.dotfiles/zsh/config.zsh
+
+# Load Aliases 
+[[ -f $HOME/.dotfiles/zsh/zsh_aliases.zsh ]] && source $HOME/.dotfiles/zsh/zsh_aliases.zsh
+
+# Load Key Bindings 
+[[ -f $HOME/.dotfiles/zsh/key-bindings.zsh ]] && source $HOME/.dotfiles/zsh/key-bindings.zsh
+
+# Load Completion
+[[ -f $HOME/.dotfiles/zsh/completion.zsh ]] && source $HOME/.dotfiles/zsh/completion.zsh
+
+# Import functions
+for file in $HOME/.dotfiles/functions/*.zsh(N); do
+  source $file
+done
+
+# Load Prompt 
+[[ -f $HOME/.dotfiles/zsh/prompt.zsh ]] && source $HOME/.dotfiles/zsh/prompt.zsh
+
+### === Fortune and Cowsay === ###
+# # Get list of cowsay animals as array
+# animals=(${(f)"$(cowsay -l)"})
+# # Pick one at random
+# animals_index=$(( (RANDOM % ${#animals[@]}) + 1 ))
+# random_animal=${animals[$animals_index]}
+# fortune -s | cowsay -f $random_animal
+
+### === Load the ascii art. === ###
+[[ -f $HOME/.dotfiles/asciiart/asciiart.rc ]] && source $HOME/.dotfiles/asciiart/asciiart.rc
+
+### source ~/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+### [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# === NVM (Node Version Manager) setup ===
+export NVM_DIR="$HOME/.nvm"
+# load nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Auto-load Node version from .nvmrc if it exists
+autoload -U add-zsh-hook
+load-nvmrc() {
+  if [ -f .nvmrc ]; then
+    # If a .nvmrc file exists, use its version
+    nvm use > /dev/null
+  else
+    # Otherwise, automatically use the latest installed Node version
+    local latest_node
+    latest_node=$(/bin/ls -1 "$NVM_DIR/versions/node" | sort -V | tail -1)
+    if [ -n "$latest_node" ]; then
+      nvm use "$latest_node" > /dev/null
+    fi
+  fi
+}
+# Hook to run function every time you change directories
+add-zsh-hook chpwd load-nvmrc
+# Run once at shell startup
+load-nvmrc

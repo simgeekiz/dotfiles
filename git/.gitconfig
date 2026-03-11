@@ -14,13 +14,56 @@
 [alias]
   co = checkout   # Add (stage) file
   ch = checkout
+  cob = checkout -b 
+  chb = checkout -b 
   br = branch
-  ci = commit
+  bra = branch
+  com = commit -am
+  sta = status 
   st = status   # Status
   s = status --short
   a = add   
+  aa = add -A :/
   ua = reset HEAD # Add (stage) file
   d = diff
+  # push
+  pus = push
+  pushf = push --force
+  # pull
+  pul = pull
+  # clone
+  clo = clone
+  # fetch
+  fet = fetch
+  # undo 
+  undo = reset --soft HEAD~1
+  # unstage 
+  unstage = reset
+  #undonunstage
+  undonunstage = reset HEAD~1
+  # //Add text git undo git unstage and discard changes
+  undonunstagendiscard = reset --hard HEAD~1
+  unstagefp = restore --staged
+  unstagendiscardfp = git restore
+
+  # get last commit Id
+  lastcommitid= log -1 --format=%H 
+  lci= log -1 --format=%H
+  
+  # 
+  # addtaglast='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
+  # addtag='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
+  # addtaglast='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
+  # addtag='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
+  # addtagremote='git push origin $1'
+  # deltag='git tag -d $1'
+  # deltag='git tag -d $1'
+  # deltagremote='git push --delete origin $1'
+  # tagls='git tag -n'
+  # addremote='git remote add origin $1'
+  # # alias gaddremote='git remote add origin $1'
+  # gaddremote='f() { git remote add "$1" "$2" }; f'
+
   # Sharable diff with disabled syntax highlighting and +/- marks
   patch = !git --no-pager diff --no-color
   # Merge fresh master into the current branch

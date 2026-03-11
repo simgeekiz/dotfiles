@@ -1,75 +1,101 @@
-# Key bindings
+# Config
 # Author: Simge Ekiz
 
-#### Turn off the sometimes annoying beep
+## APPEARANCE ###
+# Sets color variable such as $fg, $bg, $color and $reset_color
+autoload -U colors && colors
+
+#### Turn off the annoying beep
 setopt NO_BEEP
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
+
+setopt prompt_subst  # needed for $(...) in PROMPT
 
 ### Directory Navigation ###
 # Allows you to change directories just by typing the directory name
 setopt auto_cd
 setopt correct_all
 
-### History ###
-# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
+# =========================
+# History
+# =========================
+# History file and size
 HISTSIZE=100000
 SAVEHIST=$HISTSIZE
 HISTFILE=~/.zsh_history
 
-setopt hist_ignore_all_dups  # Keep only the latest copy of duplicate commands
-# Delete an old recorded event if a new event is a duplicate.
-setopt share_history  # Share history across sessions instantly
-setopt hist_reduce_blanks # Remove extra spaces from history commands
-setopt hist_ignore_space # Don't record commands starting with a space
-setopt hist_verify               # Show expanded history command before running
-# Do not execute immediately upon history expansion.
+# Duplicate handling
+setopt hist_ignore_all_dups      # Keep only the latest copy of duplicate commands
+setopt hist_ignore_dups          # Do not record an event that was just recorded again.
+setopt hist_expire_dups_first    # Expire a duplicate first when trimming history.
+setopt hist_find_no_dups         # Don't show a previously found history entry
+setopt hist_save_no_dups         # Don't save duplicates to file
+
+# Formatting and verification
+setopt hist_reduce_blanks        # Remove extra spaces from history commands
+setopt hist_ignore_space         # Don't record commands starting with a space
+setopt hist_verify               # Show expanded history command before executing
 setopt inc_append_history        # Write each command to disk right away.
 setopt extended_history          # Save timestamps with history entries
-setopt HIST_EXPIRE_DUPS_FIRST    # Expire a duplicate event first when trimming history.
-setopt HIST_IGNORE_DUPS          # Do not record an event that was just recorded again.
-setopt HIST_FIND_NO_DUPS         # Do not display a previously found event.
-setopt HIST_SAVE_NO_DUPS         # Do not write a duplicate event to the history file.
-setopt HIST_BEEP                 # Beep when accessing non-existent history.
 
+# Sharing across sessions and alerts
+setopt share_history             # Share history across sessions instantly
+setopt hist_beep                 # Beep when accessing non-existent history.
 
-## APPEARANCE ###
-# Sets color variable such as $fg, $bg, $color and $reset_color
-autoload -U colors && colors
+### Custom variables ###
+export SHOW_CAT="true"
 
-# Use diff --color if available
-if command diff --color /dev/null{,} &>/dev/null; then
-  function diff {
-    command diff --color "$@"
-  }
+### Completion behaviour ###
+# Uncomment the following line to use case-sensitive completion.
+export CASE_SENSITIVE="true"
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+export HYPHEN_INSENSITIVE="true"
+
+# Menu-like autocompletion selection
+zmodload -i zsh/complist
+setopt auto_list        # Automatically list choices on ambiguous completion
+setopt auto_menu        # show completion menu on successive tab press
+setopt always_to_end    # Move cursor to end if word had one match
+unsetopt menu_complete  # do not autoselect the first completion entry
+unsetopt flowcontrol
+setopt complete_in_word
+### setopt NO_COMPLETE_ALIASES
+
+### Diff color ### 
+# Use diff --color if available 
+# diff file1 file2 becames diff --color file1 file2
+if diff --color /dev/null /dev/null &>/dev/null; then
+  diff() { command diff --color "$@"; }
 fi
 
+# =========================
+# LS colors
+# =========================
 # Don't set ls coloring if disabled
-[[ "$DISABLE_LS_COLORS" != true ]] || return 0
-
+if [[ "$DISABLE_LS_COLORS" != true ]]; then
 # Set up ls colors and alias based on the platform
-
-case "$(uname -s)" in
-  Darwin*)
-    # Default coloring for BSD-based ls # macOS / BSD 
-    export LSCOLORS="ExFxCxDxBxegedabagacad"
-    ;;
-  Linux*)
-    # Default coloring for GNU-based ls
-    if [[ -z "$LS_COLORS" ]]; then
-      # Define LS_COLORS via dircolors if available. Otherwise, set a default
-      # equivalent to LSCOLORS (generated via https://geoff.greer.fm/lscolors)
-      if (( $+commands[dircolors] )); then
-        [[ -f "$HOME/.dircolors" ]] \
-          && source <(dircolors -b "$HOME/.dircolors") \
-          || source <(dircolors -b)
-      else
-        export LS_COLORS="di=1;94:ln=1;95:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43:*.md=32:*.sh=33"
+  case "$(uname -s)" in
+    Darwin*)
+      # Default coloring for BSD-based ls # macOS / BSD 
+      export LSCOLORS="ExFxCxDxBxegedabagacad"
+      ;;
+    Linux*)
+      # Default coloring for GNU-based ls
+      if [[ -z "$LS_COLORS" ]]; then
+        # Define LS_COLORS via dircolors if available. Otherwise, set a default
+        # equivalent to LSCOLORS (generated via https://geoff.greer.fm/lscolors)
+        if (( $+commands[dircolors] )); then
+          source <(dircolors -b)
+        else
+          export LS_COLORS="di=1;94:ln=1;95:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43:*.md=32:*.sh=33"
+        fi
       fi
-    fi
-    ;;
-esac
+      ;;
+  esac
+fi
 
 
 

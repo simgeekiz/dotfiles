@@ -1,17 +1,31 @@
 ### Shortcuts to remember
-install the extentions 
+install the extentions
 ```
 # Install extensions
 xargs -n 1 code --install-extension < ~/.dotfiles/vscode/vscode-extensions.txt
 <!-- cat ~/.dotfiles/vscode/vscode-extensions.txt | xargs -L 1 code --install-extension -->
-
 ```
-- To render .md files 
-``` 
-Ctrl + K V (Windows/Linux) 
+- Check / Customize Shortcuts (Open Keyboard Shortcuts)
+```
+Go to File → Preferences → Keyboard Shortcuts (or press Ctrl + K, Ctrl + S).
+```
+
+- To render .md files
+```
+Ctrl + K V (Windows/Linux)
 Or Cmd + K V (Mac)
 ```
-  
+
+- To format Document
+```
+Ctrl + Shift + I
+```
+
+- To format Selection
+```
+Select the code → Ctrl + K, Ctrl + F (Linux/Windows) / Cmd + K, Cmd + F (Mac)
+```
+
 🧭 Navigation    
 
 | Action                     | Windows / Linux    | macOS             |  
@@ -56,6 +70,6 @@ Or Cmd + K V (Mac)
 | Column (box) selection | `Shift + Alt + drag` | `Option + Cmd + drag` |
 
 
-⚙️ Customize Shortcuts 
+⚙️ Customize Shortcuts
 
 Press Ctrl + K, then Ctrl + S (or Cmd + K Cmd + S on macOS) to open the Keyboard Shortcuts menu.

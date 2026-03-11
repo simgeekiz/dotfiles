@@ -28,6 +28,18 @@ So when you're typing a command in the terminal, you can do things like:
     🔁 Undo
     - Ctrl + _	Undo last change
 
+    - Ctrl + L	Clear the screen (like `clear` command)
+    - Ctrl + C	Cancel the current command
+    - Ctrl + Z	Suspend the current command (can be resumed with `fg`)
+    - Ctrl + X	Clear the current line
+    - Ctrl + T	Transpose characters (swap the character before and after the cursor)
+    - Ctrl + Y	Redo last change
+    - Ctrl + D  Log out of the current shell (like `exit` command)
+
+    - Alt + l  Lowercase the character under the cursor
+    - Alt + u  Uppercase the character under the cursor
+
+  
 - Added Keybindings
 
   | Key             | Sequence | Action        |  

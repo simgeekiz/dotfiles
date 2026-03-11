@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 #
 # Usage: extract <file>
 # Description: extracts files / mounts disk images

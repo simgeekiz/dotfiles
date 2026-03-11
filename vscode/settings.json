@@ -2,11 +2,9 @@
   "typescript.tsc.autoDetect": "off",
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "true",
   },
-  "eslint.validate": [
-    "javascript"
-  ],
+  "eslint.validate": ["javascript"],
   "workbench.preferredDarkColorTheme": "Visual Studio Dark",
   "workbench.preferredHighContrastColorTheme": "Visual Studio Dark",
   "workbench.preferredHighContrastLightColorTheme": "Visual Studio Dark",
@@ -14,7 +12,7 @@
   "typescript.inlayHints.enumMemberValues.enabled": true,
   "git.autofetch": true,
   "editor.fontFamily": "Menlo, Consolas, DejaVu Sans Mono, monospace",
-  "editor.minimap.autohide": true,
+  "editor.minimap.autohide": "mouseover",
   "html.format.indentInnerHtml": true,
   "html.format.indentHandlebars": true,
   "editor.multiCursorModifier": "ctrlCmd",
@@ -24,15 +22,61 @@
   "editor.suggest.showStatusBar": true,
   "workbench.colorTheme": "Visual Studio Dark",
   "editor.minimap.enabled": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[javascript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
   "editor.tabSize": 2,
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.wordWrap": "on",
-  "diffEditor.ignoreTrimWhitespace": false
+  "diffEditor.ignoreTrimWhitespace": false,
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "jinja-html": false,
+    "python": true,
+  },
+  "editor.formatOnSave": true,
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode",
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+  },
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length", "88"],
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[jinja-html]": {
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.formatOnSave": true,
+  },
+  "files.associations": {
+    "**/templates/**/*.html": "jinja-html",
+  },
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.jsx": "${capture}.js",
+    "*.tsx": "${capture}.ts",
+    "tsconfig.json": "tsconfig.*.json",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+    "*.sqlite": "${capture}.${extname}-*",
+    "*.db": "${capture}.${extname}-*",
+    "*.sqlite3": "${capture}.${extname}-*",
+    "*.db3": "${capture}.${extname}-*",
+    "*.sdb": "${capture}.${extname}-*",
+    "*.s3db": "${capture}.${extname}-*",
+  },
+  "github.copilot.nextEditSuggestions.enabled": false,
+  "editor.fontSize": 12,
 }

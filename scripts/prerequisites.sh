@@ -123,7 +123,7 @@ else
   exec /bin/zsh
 fi
 
-curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/functions/upload_ssh_to_github.zsh
+curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/scripts/upload_ssh_to_github.zsh
 [ -x /bin/zsh ] && /bin/zsh upload_ssh_to_github.zsh || bash upload_ssh_to_github.zsh
 
 # # Check if the .dotfiles directory exists

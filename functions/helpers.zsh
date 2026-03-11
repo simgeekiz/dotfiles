@@ -1,3 +1,6 @@
+# ---------------
+#  files.zsh      
+# --------------
 symlink() {
   local source_file="$1"
   local destination_file="$2"
@@ -24,7 +27,7 @@ backup_file() {
   #    It does not check if the file exists — only that the string path is not empty.
   if [[ -e "$source_file" ]]; then
     if [ ! -L "$source_file" ]; then
-      mv "$target" "$target.backup"
+      mv "$source_file" "$source_file.backup"
       echo "🧾 Moved your old $source_file config file to $source_file.backup"
     # return 0  # success
     # return 1  # failure
@@ -34,37 +37,21 @@ backup_file() {
   fi
 }
 
+# ---------------
+#  env.zsh      
+# --------------
+add_to_path() {
+  if [[ ":$PATH:" != *":$1:"* ]]; then
+    export PATH="$1:$PATH"
+  fi
+}
+
+# ---------------
+#  logging.zsh      
+# --------------
 print_log () {
     echo
     echo "---------------------------------------------------------------------------" >&2
     echo "$1"
     echo "---------------------------------------------------------------------------" >&2
 }
-
-# Function to prompt user for yes/no input and run callback
-prompt_user() {
-  local message=$1
-  local yes_callback=$2
-  local no_callback=$3
-
-  while true; do
-    printf "$message [Y/n]: "
-    read user_input
-    user_input=$(echo "$user_input" | xargs) # Trim whitespace
-    user_input=${user_input:-y} # set default to 'y' if empty
-
-    case "$user_input" in
-      y|Y|yes|YES|Yes|YeS|yEs|YEs) eval "$yes_callback"; break ;;
-      n|N|no|NO|No|nO) echo "⏭️  Skipping..."
-      [[ -n "$no_callback" ]] && eval "$no_callback"; break ;;
-      *) echo "❓ Please answer yes [y] or no [n]." ;;
-    esac
-  done
-}
-
-function add_to_path() {
-  if [[ ":$PATH:" != *":$1:"* ]]; then
-    export PATH="$1:$PATH"
-  fi
-}
-

@@ -2,6 +2,7 @@
 autoload -Uz compinit
 
 # Caching autocompletion
+# if [[ -f ~/.zcompdump && ~/.zcompdump -nt ~/.zshrc ]]; then
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
   compinit -i # Tab-completion for options, Git branches, etc.
 else
@@ -9,28 +10,17 @@ else
   compinit -C -i
 fi
 
-# Menu-like autocompletion selection
-zmodload -i zsh/complist
+# Zsh completion uses a 5-part context system:
+# :completion:function:completer:command:argument:tag
 
-setopt auto_list        # Automatically list choices on ambiguous completion
-setopt auto_menu         # show completion menu on successive tab press
-setopt always_to_end    # Move cursor to end if word had one match
-unsetopt menu_complete   # do not autoselect the first completion entry
-unsetopt flowcontrol
-setopt complete_in_word
-# Do not expand ~ to full home path in completion
-setopt NO_COMPLETE_ALIASES
-
-# enables interactive menu selection with arrow keys
+# Ensures that the completion menu is always shown
 zstyle ':completion:*' menu select
+
 # set completion colors to be the same as `ls`, if available
 [[ -z "$LS_COLORS" ]] || zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # # Group results by category
 # zstyle ':completion:*' group-name ''
-
-#Ensures that the completion menu is always shown
-zstyle ':completion:*:*:*:*:*' menu select 
 
 # Make completion case-insensitive
 # zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'

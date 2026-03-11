@@ -1,3 +1,4 @@
+# Interactive shell helpers
 function with_cat() {
   # 🐱 Define ASCII art function 🐾
   # Run any command passed in
@@ -11,61 +12,29 @@ function with_cat() {
   fi
 }
 
-function ls() {  
-  command ls --color "$@"  # runs the real `ls`, bypassing your custom function
-  with_cat
-}
-
-function cat() {
-  command cat "$@"
-  with_cat
-}
-
-function grep() {
-  command grep --color "$@"
-  with_cat
-}
-
-
-# Clean Debian packages
-apt-clean() {
-    sudo apt-get clean
-    sudo apt-get autoclean
-    sudo apt-get autoremove
-}
-
 # Create a new directory and enter it
 mkd() {
-    mkdir -p "$@" && cd "$@"
+    mkdir -p "$1" && cd "$1"
 }
 
-# Show the current weather
-weather() {
-    # ANSI colors
-  local RED="\033[31m"
-  local GREEN="\033[32m"
-  local BLUE="\033[34m"
-  local ORANGE="\033[38;5;214m"
-  local CYAN="\033[36m"
-  local YELLOW="\033[33m"
-  local BOLD="\033[1m"
-  local RESET="\033[0m"
 
-  local location="${1:-}"
-  echo "🌞 Fetching weather for ${BOLD}${location:-'your location'}...${RESET}"
+# Function to prompt user for yes/no input and run callback
+prompt_user() {
+  local message=$1
+  local yes_callback=$2
+  local no_callback=$3
 
-  # Get weather summary
-  local raw
+  while true; do
+    printf "$message [Y/n]: "
+    read user_input
+    user_input=$(echo "$user_input" | xargs) # Trim whitespace
+    user_input=${user_input:-y} # set default to 'y' if empty
 
-  if [[ -z "$location" ]]; then
-    raw=$(curl -s "wttr.in?format=%l|%c|%C|%t|%w|%m")
-  else
-    raw=$(curl -s "wttr.in/${location// /+}?format=%l|%c|%C|%t|%w|%m")
-  fi
-
-  # Split parts
-  IFS="|" read -r city emoji desc temp wind moon <<< "$raw"
-
-  # Print formatted and colored output
-  echo -e "Today: ${BOLD}${GREEN}${city}${RESET}: ${emoji}${ORANGE}(${desc})${RESET} ${RED}${temp}${RESET} ${CYAN}${wind}${RESET} ${YELLOW}Moon:${moon}${RESET}"
+    case "$user_input" in
+      y|Y|yes|YES|Yes|YeS|yEs|YEs) eval "$yes_callback"; break ;;
+      n|N|no|NO|No|nO) echo "⏭️  Skipping..."
+      [[ -n "$no_callback" ]] && eval "$no_callback"; break ;;
+      *) echo "❓ Please answer yes [y] or no [n]." ;;
+    esac
+  done
 }

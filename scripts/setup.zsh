@@ -23,10 +23,10 @@ else
 fi
 
 # software installations
-prompt_user "🛠️  Do you want to do installation?" 'source $HOME/.dotfiles/setup/install.zsh' ""
+prompt_user "🛠️  Do you want to do installation?" 'source $HOME/.dotfiles/scripts/install.zsh' ""
 
 # === Symlink dotfiles ===
-[[ -f "$HOME/.dotfiles/setup/symlink.zsh" ]] && source "$HOME/.dotfiles/setup/symlink.zsh"
+[[ -f "$HOME/.dotfiles/scripts/symlink.zsh" ]] && source "$HOME/.dotfiles/scripts/symlink.zsh"
 
 echo "🦆 Restarting Terminal"  
 exec $SHELL

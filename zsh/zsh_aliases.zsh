@@ -5,8 +5,7 @@ alias python=python3
 alias pip='pip3'
 
 # Environment Control
-alias venv='python3 -m venv .env'
-alias src='. .env/bin/activate'
+alias activate='source .env/bin/activate'
 alias deac='deactivate'
 
 # Interesting Mix
@@ -16,47 +15,9 @@ alias histg='history | grep -i'
 alias please='sudo'
 
 # Git aliases
-alias gadd='git add'
 alias gaa='git add -A :/'
-alias gcom='git commit'
-alias gcam='git commit -am'
-alias gcek='git checkout'
 alias gsta='git status'
 alias gbra='git branch'
-alias gpush='git push'
-alias gpus='git push'
-alias gpull='git pull'
-alias gpul='git pull'
-alias gclo='git clone'
-alias gclone='git clone'
-alias gfetch='git fetch'
-alias gfet='git fetch'
-
-alias gundo='git reset --soft HEAD~1'
-alias gunstage='git reset'
-alias gundonunstage='git reset HEAD~1'
-
-# //Add text git undo git unstage and discard changes
-alias gundonunstagendiscard='git reset --hard HEAD~1'
-alias gunstagefp='git restore --staged'
-alias gunstagendiscardfp='git restore'
-alias gncek='git checkout -b'
-
-# git last commit id git log -1 --format=%H
-alias glci='git log -1 --format=%H'
-alias gitlastcommitid='git log -1 --format=%H'
-alias gitaddtaglast='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
-alias gitaddtag='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
-alias gaddtaglast='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
-alias gaddtag='f() { git tag -a "$1" $(git rev-parse HEAD) -m "trigger ci/cd for $1"; }; f'
-alias gitaddtagremote='git push origin $1'
-alias gdeltag='git tag -d $1'
-alias gitdeltag='git tag -d $1'
-alias gitdeltagremote='git push --delete origin $1'
-alias gittagls='git tag -n'
-alias gitaddremote='git remote add origin $1'
-# alias gaddremote='git remote add origin $1'
-alias gaddremote='f() { git remote add "$1" "$2" }; f'
 
 # VSCODE
 alias editdotfiles='code $HOME/.dotfiles'
@@ -126,8 +87,13 @@ alias cdwork='cd $HOME/workspaces/'
 
 alias realrm="/bin/rm"
 alias realls="/bin/ls"
+alias realgrep="/bin/grep"
 
 # ls and easy report
+case "$(uname -s)" in
+  Darwin*) alias ls='ls -G' ;;
+  Linux*)  alias ls='ls --color=auto' ;;
+esac
 alias ll='ls -al'
 alias la='ls -A'
 alias lla='ls -lah'
@@ -142,7 +108,7 @@ alias fdir='find . -type d -name'
 alias ff='find . -type f -name'
 
 # df(short for disk free) is used to show the amount of free disk space available
-# Show human friendly numbers and colors 
+# Show human friendly numbers and colors
 alias df='df -h'
 alias du='du -h -d 2'
 

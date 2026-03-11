@@ -12,7 +12,7 @@
 function install_fonts() {
   # This script installs custom fonts from a specified source directory to the target font directory.
   echo "🌌 Installing Custom Fonts..."
- 
+
   # Source folder where your fonts are stored
   FONT_SOURCE_DIR="$HOME/.dotfiles/fonts"
 
@@ -22,11 +22,11 @@ function install_fonts() {
     FONT_TARGET_DIR="$HOME/.local/share/fonts"
   elif [[ $(uname) == "Darwin" ]]; then
     FONT_TARGET_DIR="$HOME/Library/Fonts"
-  fi 
+  fi
 
   if [ ! -d "$FONT_SOURCE_DIR" ]; then
     echo "❌ Font source folder not found: $FONT_SOURCE_DIR"
-    return 1   
+    return 1
   fi
 
   # Track whether any fonts were copied
@@ -34,7 +34,7 @@ function install_fonts() {
 
   # Create the target directory if it doesn't exist
   if [ ! -d "$FONT_TARGET_DIR" ]; then
-    mkdir -p "$FONT_TARGET_DIR"  
+    mkdir -p "$FONT_TARGET_DIR"
   fi
 
   while IFS= read -r -d '' font_file; do
@@ -49,7 +49,7 @@ function install_fonts() {
 
   # # Copy .ttf and .otf fonts
   # find "$FONT_SOURCE_DIR" -type f \( -iname "*.ttf" -o -iname "*.otf" \) -exec cp "{}" "$FONT_TARGET_DIR" \;
-  
+
   if $fonts_copied; then
     echo "🔄 Updating font cache..."
     fc-cache -f -v
@@ -58,10 +58,10 @@ function install_fonts() {
   fi
 
   echo '📜 Please change your font in Preferences and select MesloLGS NF Regular'
-  # Guake: 
-  # Under Appearance tab, uncheck Use the system fixed width font (if not already) and select MesloLGS NF Regular. 
+  # Guake:
+  # Under Appearance tab, uncheck Use the system fixed width font (if not already) and select MesloLGS NF Regular.
   # Exit the Preferences dialog by clicking Close.
-  # Apple Terminal: 
+  # Apple Terminal:
   # Open Terminal → Preferences → Profiles → Text, click Change under Font and select MesloLGS NF family.
 }
 
@@ -120,7 +120,7 @@ function install_gui {
     else
       echo "🔧 Installing $name..."
       if [[ $name == "code" ]]; then
-        install_code "$name" 
+        install_code "$name"
       else
         install_deb "$name" "$url"
       fi
@@ -132,15 +132,27 @@ function install_gui {
 function install_nodejs() {
   echo "🚀 Installing Node.js..."
   # Installing Node.js dependencies...
-  npm config set loglevel warn
-  npm install -g npm-upgrade
-  npm install
+  # Download and install nvm:
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+  # in lieu of restarting the shell
+  \. "$HOME/.nvm/nvm.sh"
+
+  # Download and install Node.js:
+  nvm install 24
+
+  # Verify the Node.js version:
+  node -v # Should print "v24.11.0".
+
+  # Verify npm version:
+  npm -v # Should print "11.6.1".
+
 }
 
 # Function to install CLI tools and update the system
 function install_cli {
   # Get operating system
- 
+
   echo "🔄 Updating system..."
   sudo apt update && sudo apt upgrade -y
 
@@ -167,15 +179,15 @@ function install_cli {
 }
 
 # Ask the user if they want to install custom fonts and powerlevel10k
-prompt_user "🛠️  Do you want to install Powerlevel10k?" "install_fonts && install_p10k" ""
+### prompt_user "🛠️  Do you want to install Powerlevel10k?" "install_fonts && install_p10k" ""
 
 case "$(uname -s)" in
   Darwin*)
     printf "🍎 Platform detected as macOS. Installing accordingly."
     # to install only CLI tools (strip cask lines)
     prompt_user "🦋 Do you want to install GUI (desktop) applications as well?" \
-    'echo "☕️ Installing Homebrew dependencies... 🏡 Setting up GUI apps..."; brew bundle install --file="$HOME/.dotfiles/setup/Brewfile"' \
-    'echo "☕️ Installing CLI tools and libraries... 📝 Skipping GUI apps..."; grep "^brew " "$HOME/.dotfiles/setup/Brewfile" > "$HOME/.dotfiles/setup/Brewfile.cli"; brew bundle install --file="$HOME/.dotfiles/setup/Brewfile.cli"; rm "$HOME/.dotfiles/setup/Brewfile.cli"'
+    'echo "☕️ Installing Homebrew dependencies... 🏡 Setting up GUI apps..."; brew bundle install --file="$HOME/.dotfiles/scripts/Brewfile"' \
+    'echo "☕️ Installing CLI tools and libraries... 📝 Skipping GUI apps..."; grep "^brew " "$HOME/.dotfiles/scripts/Brewfile" > "$HOME/.dotfiles/scripts/Brewfile.cli"; brew bundle install --file="$HOME/.dotfiles/scripts/Brewfile.cli"; rm "$HOME/.dotfiles/scripts/Brewfile.cli"'
     ;;
   Linux*)
     printf "🌲 Platform detected as Linux. Installing accordingly."

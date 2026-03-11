@@ -30,3 +30,17 @@ for r in 0 1 2 3 4 5; do
 done
 
 echo
+
+
+
+  # ANSI colors
+local RED="\033[31m"
+local GREEN="\033[32m"
+local BLUE="\033[34m"
+local ORANGE="\033[38;5;214m"
+local CYAN="\033[36m"
+local YELLOW="\033[33m"
+local BOLD="\033[1m"
+local RESET="\033[0m"
+
+echo -e "Today: ${BOLD}${GREEN}city${RESET}: ${emoji}${ORANGE}(desc)${RESET} ${RED}temp${RESET} ${CYAN}wind${RESET} ${YELLOW}Moon:moon${RESET}"

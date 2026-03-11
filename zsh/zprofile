@@ -1,0 +1,11 @@
+typeset -U path
+
+# Add custom bin directory to PATH 
+if [[ -d "$HOME/.dotfiles/bin" ]]; then
+  path=("$HOME/.dotfiles/bin" $path)
+fi
+
+
+export EDITOR="nano"
+export PAGER="less"
+export VIRTUAL_ENV_DISABLE_PROMPT=1
