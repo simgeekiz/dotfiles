@@ -1,11 +1,8 @@
-typeset -U path
+# ~/.zprofile
+# Zsh login shell configuration for environment and PATH setup
+# Managed by: ~/.dotfiles/zsh/zprofile
+# Author: Simge Ekiz
+# License: MIT
 
-# Add custom bin directory to PATH 
-if [[ -d "$HOME/.dotfiles/bin" ]]; then
-  path=("$HOME/.dotfiles/bin" $path)
-fi
+[ -r $HOME/.dotfiles/zsh/env.zsh ] && source $HOME/.dotfiles/zsh/env.zsh
 
-
-export EDITOR="nano"
-export PAGER="less"
-export VIRTUAL_ENV_DISABLE_PROMPT=1

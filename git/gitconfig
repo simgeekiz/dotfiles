@@ -1,3 +1,9 @@
+# ~/.gitconfig
+# Git configuration file
+# Managed by: ~/.dotfiles/git/gitconfig
+# Author: Simge Ekiz
+# License: MIT
+
 [init]
 	defaultBranch = main
 
@@ -129,5 +135,5 @@
   whitespace = red reverse
 
 [user]
-	email = simgeekiz48@gmail.com
 	name = Simge Ekiz
+  email = simgeekiz48@gmail.com

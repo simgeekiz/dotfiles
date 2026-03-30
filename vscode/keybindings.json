@@ -1,4 +1,8 @@
-// Place your key bindings in this file to override the defaults
+// ~/.dotfiles/vscode/keybindings.json
+// VSCode keybindings configuration
+// Managed by: ~/.dotfiles/vscode/keybindings.json
+// Author: Simge Ekiz
+// License: MIT
 [
   {
     "key": "shift+alt+down",

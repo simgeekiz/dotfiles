@@ -1,29 +1,42 @@
-# ~/.dotfiles/zsh/.zshrc
+# ~/.zshrc
+# Main Zsh configuration file for interactive shells
+# Managed by: ~/.dotfiles/zsh/zshrc
+# Author: Simge Ekiz
+# License: MIT
+
+
+# Only run in Zsh
+[[ -n $ZSH_VERSION ]] || return 0
 
 ### === Load modular Zsh setup === ###
+source_if_exists() {
+  [[ -r "$1" ]] && source "$1"
+}
 
-# Source .zprofile first (optional, for non-login shells)
-[[ -f $HOME/.dotfiles/zsh/zprofile ]] && source $HOME/.dotfiles/zsh/zprofile
+# Source Env
+source_if_exists "$HOME/.dotfiles/zsh/env.zsh"
 
 # Load Config
-[[ -f $HOME/.dotfiles/zsh/config.zsh ]] && source $HOME/.dotfiles/zsh/config.zsh
+source_if_exists "$HOME/.dotfiles/zsh/config.zsh"
 
 # Load Aliases 
-[[ -f $HOME/.dotfiles/zsh/zsh_aliases.zsh ]] && source $HOME/.dotfiles/zsh/zsh_aliases.zsh
+source_if_exists "$HOME/.dotfiles/zsh/zsh_aliases.zsh"
+source_if_exists "$HOME/.dotfiles/tmux/tmux_aliases.sh"
+source_if_exists "$HOME/.dotfiles/git/git_aliases.sh"
 
 # Load Key Bindings 
-[[ -f $HOME/.dotfiles/zsh/key-bindings.zsh ]] && source $HOME/.dotfiles/zsh/key-bindings.zsh
+source_if_exists "$HOME/.dotfiles/zsh/key-bindings.zsh"
 
 # Load Completion
-[[ -f $HOME/.dotfiles/zsh/completion.zsh ]] && source $HOME/.dotfiles/zsh/completion.zsh
+source_if_exists "$HOME/.dotfiles/zsh/completion.zsh"
 
 # Import functions
-for file in $HOME/.dotfiles/functions/*.zsh(N); do
-  source $file
+for file in $HOME/.dotfiles/functions/*.sh(N); do
+  source "$file"
 done
 
 # Load Prompt 
-[[ -f $HOME/.dotfiles/zsh/prompt.zsh ]] && source $HOME/.dotfiles/zsh/prompt.zsh
+source_if_exists "$HOME/.dotfiles/zsh/prompt.zsh"
 
 ### === Fortune and Cowsay === ###
 # # Get list of cowsay animals as array
@@ -34,7 +47,7 @@ done
 # fortune -s | cowsay -f $random_animal
 
 ### === Load the ascii art. === ###
-[[ -f $HOME/.dotfiles/asciiart/asciiart.rc ]] && source $HOME/.dotfiles/asciiart/asciiart.rc
+source_if_exists "$HOME/.dotfiles/asciiart/asciiart.rc"
 
 ### source ~/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -42,25 +55,45 @@ done
 
 # === NVM (Node Version Manager) setup ===
 export NVM_DIR="$HOME/.nvm"
-# load nvm
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Load NVM if available
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  # Only load once (idempotent)
+  if ! (( $+functions[nvm] )); then
+    source "$NVM_DIR/nvm.sh"
+  fi
+fi
 
 # Auto-load Node version from .nvmrc if it exists
 autoload -U add-zsh-hook
+
 load-nvmrc() {
-  if [ -f .nvmrc ]; then
-    # If a .nvmrc file exists, use its version
-    nvm use > /dev/null
+  # Find desired version
+  local nvm_version desired_node
+
+  if [[ -f .nvmrc ]]; then
+   # If a .nvmrc file exists, use its version
+    desired_node=$(<.nvmrc)
   else
     # Otherwise, automatically use the latest installed Node version
     local latest_node
     latest_node=$(/bin/ls -1 "$NVM_DIR/versions/node" | sort -V | tail -1)
-    if [ -n "$latest_node" ]; then
+    if [[ -n "$latest_node" ]]; then
       nvm use "$latest_node" > /dev/null
     fi
   fi
+
+  # Only switch if different from current
+  if [[ -n "$desired_node" ]] && [[ "$desired_node" != "$(nvm current)" ]]; then
+    nvm use "$desired_node" > /dev/null 2>&1
+  fi
 }
-# Hook to run function every time you change directories
-add-zsh-hook chpwd load-nvmrc
+
+# Hook to run function every time you change directories (safe: avoid duplicates)
+if ! (( $+functions[load_nvmrc_hook_added] )); then
+  add-zsh-hook chpwd load-nvmrc
+  typeset -g load_nvmrc_hook_added=1
+fi
+
 # Run once at shell startup
 load-nvmrc

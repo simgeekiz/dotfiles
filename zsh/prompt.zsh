@@ -1,25 +1,30 @@
+# ~/.dotfiles/zsh/prompt.zsh
+# Zsh module configuring custom shell prompt
+# Managed by: ~/.dotfiles/zsh/prompt.zsh
+# Author: Simge Ekiz
+# License: MIT
 
 # Enable colors and git detection
-autoload -U colors && colors
+autoload -U colors add-zsh-hook
+colors
 
 # Git branch function
 git_branch() {
   local branch
-  branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-  if [[ -n $branch ]]; then
-    echo "%F{white}|%f %F{yellow}${branch}%f "
-  fi
+  branch=$(command git symbolic-ref --short HEAD 2>/dev/null) || \
+  branch=$(command git rev-parse --short HEAD 2>/dev/null) || return
+  print -r -- "%F{white}|%f %F{yellow}${branch}%f "
 }
 
 # Python / virtualenv detection
 venv_prompt() {
-  if [[ -n "$VIRTUAL_ENV" ]]; then
-    echo "%F{white}|%f %F{green}($(basename $VIRTUAL_ENV))%f "
+  if [[ -n "${VIRTUAL_ENV-}" ]]; then
+    print -r -- "%F{white}|%f %F{green}($(basename "$VIRTUAL_ENV"))%f "
   fi
 }
 
 # ---- final prompt ----
-precmd() {
+set_prompt() {
   PROMPT='%K{236}'                       # gray background 
   PROMPT+='%F{cyan}%n@%m%f'              # user@hostname
   PROMPT+='%F{white}|%f %F{blue}%~%f '   # current path
@@ -28,6 +33,10 @@ precmd() {
   PROMPT+='%F{white}%#  %f'              # prompt char (# or $)
   PROMPT+='%k'                           # end background
 }
+
+# Run the function set_prompt every time right before the prompt is shown
+add-zsh-hook precmd set_prompt
+
 ### --- Notes
   # %B  -> start bold text
   # %b  -> end bold text

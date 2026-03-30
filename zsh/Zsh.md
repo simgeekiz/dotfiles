@@ -1,8 +1,10 @@
+- zprofile
+  PATH configuration
+
 - config.zsh
   environment variables
   shell options
   LS_COLORS configuration
-  PATH configuration
 
 - completion.zsh
   compinit

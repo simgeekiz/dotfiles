@@ -1,57 +1,53 @@
 # dotfiles
 
-                         /\_/\      *What's going on?*
+                         /\_/\      *Hello!!*
                         ( o.o )
                       ------------
+                    My natural habitat
 
-My natural habitat
+#### Features
 
-### **Assuming you have fresh operating system installed;**
+- zsh aliases.
+- Git aliases and functions in .gitconfig.
+- Lots of scripts.
+- bin files
+- Visual Studio Code settings
+- Brewfile
+- Configs for apps
+- Auto-completion
+- Powerlevel10k
+- Asciiart ^^
 
-<!-- Along these steps I am installing
-    chrome
-    Visual Studio (sync with github not microsoft)
-    From software manager:
-    # Slack
-    GUAKE terminal
--->
+### **Prerequisites:**
 
-## **Prerequisites:**
-
-- Generate SSH key. (Optional)
-  - Follow the instructions in ssh/ssh_key.md
-
-- Run the preparation script. This script does the following;
-  - installs and changes your default shell to zsh.
-  - installs git
-  - setup a ssh key(if already not exist) and uploads it to the GitHub.
-  - clones this dotfiles repository.
-  <!-- # depending on the $SHELL use bash or zsh:
-   bash/zsh .dotfiles/scripts/prerequisites.sh -->
+- Run the prerequisites script.
 
 ```
-$ curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/scripts/prerequisites.sh
-$ [ -x /bin/zsh ] && /bin/zsh prerequisites.sh || bash prerequisites.sh
+  $ curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
+  $ sh prerequisites.sh
 ```
 
-<!--
-      Or
-      -Install git and
-      # Clone the repository
-      git clone git@github.com:simgeekiz/dotfiles.git ~/.dotfiles
-      or
-      # If you don't want to use the SSH link (uses SSH key) Use HTTPS link.
-      git clone https://github.com/simgeekiz/dotfiles.git ~/.dotfiles  -->
+- Restart your terminal
 
-## **Installation**
+```
+$ exec /bin/zsh
+```
 
 - Check zsh installed and it is your current shell.
 
+```
+$ command -v zsh >/dev/null 2>&1 && [ -n "$ZSH_VERSION" ] && echo "Zsh: $ZSH_VERSION " || echo "Zsh not installed or not current shell"
+```
+
+### **Installation**
+
 - Run setup script:
 
-      zsh ./.dotfiles/scripts/setup.zsh
+```
+$ sh ./.dotfiles/bootstrap/setup.sh
+```
 
-## **Resources**
+### **Resources**
 
 - [GitHub ~/](http://dotfiles.github.io/)
 - [Erkan's dotfiles](https://github.com/ErkanBasar/dotfiles)
@@ -61,8 +57,8 @@ $ [ -x /bin/zsh ] && /bin/zsh prerequisites.sh || bash prerequisites.sh
 - [Lewagon's dotfiles](https://github.com/lewagon/dotfiles)
 - [Holman's dotfiles](https://github.com/holman/dotfiles)
 
-## **License**
+### **License**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+> This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---

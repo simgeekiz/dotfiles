@@ -1,22 +1,30 @@
-# Config
+# ~/.dotfiles/zsh/config.zsh
+# Zsh module setting environment variables and general configuration
+# Managed by: ~/.dotfiles/zsh/zshrc
 # Author: Simge Ekiz
+# License: MIT
 
 ## APPEARANCE ###
 # Sets color variable such as $fg, $bg, $color and $reset_color
 autoload -U colors && colors
 
-#### Turn off the annoying beep
+### General shell behavior ###
+# Disable terminal bell/beep on errors or tab completion
 setopt NO_BEEP
-
+# Allow comments (# ...) in interactive shell commands
+setopt interactive_comments
+# Enable command substitution (e.g. $(...) ) inside prompt variables
+setopt prompt_subst  
+# Enable extended globbing features (advanced pattern matching like ^, ~, etc.)
+setopt extendedglob
 # You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-setopt prompt_subst  # needed for $(...) in PROMPT
+export LANG=en_US.UTF-8
 
 ### Directory Navigation ###
 # Allows you to change directories just by typing the directory name
 setopt auto_cd
-setopt correct_all
+# Attempt to correct mistyped commands (can be intrusive in practice)
+# setopt correct
 
 # =========================
 # History
@@ -24,7 +32,7 @@ setopt correct_all
 # History file and size
 HISTSIZE=100000
 SAVEHIST=$HISTSIZE
-HISTFILE=~/.zsh_history
+HISTFILE="$HOME/.zsh_history"
 
 # Duplicate handling
 setopt hist_ignore_all_dups      # Keep only the latest copy of duplicate commands
@@ -37,7 +45,7 @@ setopt hist_save_no_dups         # Don't save duplicates to file
 setopt hist_reduce_blanks        # Remove extra spaces from history commands
 setopt hist_ignore_space         # Don't record commands starting with a space
 setopt hist_verify               # Show expanded history command before executing
-setopt inc_append_history        # Write each command to disk right away.
+# setopt inc_append_history        # Write each command to disk right away.
 setopt extended_history          # Save timestamps with history entries
 
 # Sharing across sessions and alerts
@@ -45,14 +53,14 @@ setopt share_history             # Share history across sessions instantly
 setopt hist_beep                 # Beep when accessing non-existent history.
 
 ### Custom variables ###
-export SHOW_CAT="true"
+export SHOW_CAT=true
 
 ### Completion behaviour ###
 # Uncomment the following line to use case-sensitive completion.
-export CASE_SENSITIVE="true"
+export CASE_SENSITIVE=true
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
-export HYPHEN_INSENSITIVE="true"
+# export HYPHEN_INSENSITIVE="true"
 
 # Menu-like autocompletion selection
 zmodload -i zsh/complist
@@ -64,12 +72,6 @@ unsetopt flowcontrol
 setopt complete_in_word
 ### setopt NO_COMPLETE_ALIASES
 
-### Diff color ### 
-# Use diff --color if available 
-# diff file1 file2 becames diff --color file1 file2
-if diff --color /dev/null /dev/null &>/dev/null; then
-  diff() { command diff --color "$@"; }
-fi
 
 # =========================
 # LS colors
@@ -96,6 +98,3 @@ if [[ "$DISABLE_LS_COLORS" != true ]]; then
       ;;
   esac
 fi
-
-
-

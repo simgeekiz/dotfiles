@@ -1,4 +1,10 @@
-#!/bin/bash
+# ~/.bashrc
+# Bash configuration for interactive shells.
+# Managed by: ~/.dotfiles/bash/bashrc
+# Author: Simge Ekiz
+# License: MIT
+
+[ -r "$HOME/.dotfiles/bash/env.bash" ] && . "$HOME/.dotfiles/bash/env.bash"
 
 # If not running interactively, don't do anything
 case $- in

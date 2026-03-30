@@ -1,4 +1,9 @@
-#
+# ~/.inputrc
+# Readline configuration for interactive programs
+# Managed via: ~/.dotfiles/bash/inputrc
+# Author: Simge Ekiz
+# License: MIT
+
 # Autocompletion
 #
 # Make Tab autocompletion case-insensitive (cd ~/dow<Tab> => cd ~/Downloads/)
