@@ -45,7 +45,7 @@ main() {
       DIR="zsh"
       ;;
     bash)
-      set -- bashrc profile
+      set -- bashrc profile inputrc bash_logout
       DIR="bash"
       ;;
     *)

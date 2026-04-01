@@ -32,15 +32,60 @@ add_to_path() {
   export PATH
 }
 
+### -- History
+hist() {
+  fc -l 1 | grep "$@"
+}
+
+histg() {
+  fc -l 1 | grep -i "$@"
+}
 
 if [ -n "$ZSH_VERSION" ] || [ -n "$BASH_VERSION" ]; then
-  historytime() { fc -il 1 }
+  historytime() { 
+    fc -il 1 
+  }
 fi
-
 
 ### -- Git
 # delete merged branches
 git-clean-branches() {
-  merged=$(git branch --merged | grep -v '^\*' | tr '\n' ' ')
-  [ -n "$merged" ] && echo "$merged" | xargs -n 1 git branch -d
+  # Only merged branches that are not current
+  git branch --merged | grep -v '^\*' | while IFS= read -r branch; do
+    [ -n "$branch" ] && git branch -d "$branch"
+  done
 }
+
+#  HEADPHONES (functions)
+turnonheadphones() {
+  command -v curl >/dev/null 2>&1 || { printf '%s\n' "curl not found"; return 1; }
+  command -v bash >/dev/null 2>&1 || { printf '%s\n' "bash not found"; return 1; }
+  printf '%s\n' "Warning: executing remote script\n" 
+  curl -fsSL "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/raw/master/src/utils/pa-info?inline=false" | bash
+}
+
+# ALERT (functions)
+# Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
+if command -v notify-send >/dev/null 2>&1; then
+  alert() {
+    status=$?
+    icon="error"
+    [ "$status" -eq 0 ] && icon="terminal"
+
+    # Zsh & Bash compatible way to get last command
+    if [ -n "$ZSH_VERSION" ]; then
+      last_cmd=$(fc -ln -1)
+    else
+      last_cmd=$(history | tail -n1 | sed -e 's/^[[:space:]]*[0-9]\+[[:space:]]*//')
+    fi
+
+    notify-send --urgency=low -i "$icon" "$last_cmd"
+  }
+fi
+
+# Homebrew
+if [ "$(uname -s)" = "Darwin" ] && command -v brew >/dev/null 2>&1; then
+  brewu() {
+    brew update && brew upgrade && brew cleanup && brew doctor
+  }
+fi

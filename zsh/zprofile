@@ -4,5 +4,7 @@
 # Author: Simge Ekiz
 # License: MIT
 
-[ -r $HOME/.dotfiles/zsh/env.zsh ] && source $HOME/.dotfiles/zsh/env.zsh
+export ZPROFILE_LOADED=1
 
+[ -r $HOME/.dotfiles/zsh/env.zsh ] && source $HOME/.dotfiles/zsh/env.zsh
+[ -r $HOME/.dotfiles/zsh/path.zsh ] && source $HOME/.dotfiles/zsh/path.zsh

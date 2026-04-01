@@ -1,8 +1,12 @@
-# ~/.dotfiles/zsh/zsh_aliases.zsh
-# Zsh module defining command aliases and tools
-# Managed by: ~/.dotfiles/zsh/zsh_aliases.zsh
+# ~/.bash_aliases
+# Bash command aliases
+# Managed via: ~/.dotfiles/bash/bashrc
 # Author: Simge Ekiz
 # License: MIT
+
+has() {
+  command -v "$1" >/dev/null 2>&1
+}
 
 # Python
 alias python='python3'
@@ -12,30 +16,28 @@ alias pip='pip3'
 alias please='sudo'
 
 # VSCODE
-(( $+commands[code] )) && alias editdotfiles='code $HOME/.dotfiles'
+has code && alias editdotfiles="code \"$HOME/.dotfiles\""
 
 # nvidia-prime Control
-if (( $+commands[prime-select] )); then
-  alias nvidia='sudo prime-select nvidia'
-fi
+has prime-select && alias nvidia='sudo prime-select nvidia'
 
-# Screen control
-if (( $+commands[screen] )); then
+# Screen Control
+if has screen; then
   alias scr='screen'
   alias scrs='screen -S'
   alias scrr='screen -r'
+  alias scrl='screen -ls'
   alias scrls='screen -ls'
-  alias scrl=scrls
   killscr() {
     [ -n "$1" ] && screen -X -S "$1" quit
   }
 fi
 
 # Jekkyl
-if (( $+commands[jekyll] )); then
+if has jekyll; then
   alias js='jekyll serve'
 
-  if (( $+commands[bundle] )); then
+  if has bundle; then
     alias bejs='bundle exec jekyll serve'
   fi
 fi
@@ -58,7 +60,6 @@ alias cddot='cd $HOME/.dotfiles'
 alias cdwork='cd $HOME/workspaces/'
 
 # Navigations
-alias -g ...='../..'
 alias cd..='cd ..'
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -70,16 +71,24 @@ if diff --color=auto /dev/null /dev/null &>/dev/null; then
   alias diff='diff --color=auto'
 fi
 
-# ls and easy report
+# ls and ls color
 case "$(uname -s)" in
   Darwin*) alias ls='ls -G' ;;
-  Linux*)  alias ls='ls --color=auto'
+  Linux*)  
+  
+      # Optional: only if dircolors exists
+    if command -v dircolors >/dev/null 2>&1; then
+      eval "$(dircolors -b ~/.dircolors 2>/dev/null || dircolors -b)"
+    fi
+
+    alias ls='ls --color=auto'
+   # alias dir='dir --color=auto'
+  # alias vdir='vdir --color=auto'
     alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto' 
     ;;
 esac
-alias ll='ls -al'
+
+alias ll='ls -l'
 alias la='ls -A'
 alias lla='ls -lah'
 alias cls='clear;ls'
@@ -93,12 +102,13 @@ alias fdir='find . -type d -name'
 alias ff='find . -type f -name'
 
 # df(short for disk free) is used to show the amount of free disk space available
-# Show human friendly numbers and colors
+# Show human friendly numbers and colors 
 alias df='df -h'
 
 case "$(uname -s)" in
   Darwin*) alias du='du -h -L 2' ;;  # BSD alternative
-  Linux*)  alias du='du -h -d 2' ;;
+  Linux*) 
+  alias du='du -h -d 2';;
 esac
 
 # Kill jobs

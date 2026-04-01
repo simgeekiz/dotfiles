@@ -1,71 +1,82 @@
 # ~/.inputrc
 # Readline configuration for interactive programs
-# Managed via: ~/.dotfiles/bash/inputrc
+# Managed via: ~/.inputrc
 # Author: Simge Ekiz
 # License: MIT
 
-# Autocompletion
-#
-# Make Tab autocompletion case-insensitive (cd ~/dow<Tab> => cd ~/Downloads/)
+# ------------------------------
+# 1. Autocompletion
+# ------------------------------
+
+# Case-insensitive completion (cd ~/dow<Tab> => cd ~/Downloads/)
 set completion-ignore-case On
 
-# When autocompleting symlinks to directories, immediately add a trailing "/"
-set mark-symlinked-directories on
-
-# Do not expand "~" to the home directory when completing. (The actual value passed on to the command still is expanded,
-# though. Which is good.) "Off" is the default value, but some servers override this
-set expand-tilde off
-
-# Flip through autocompletion matches with Shift-Tab
-"\e[Z": menu-complete
-
-# Do not autocomplete hidden files ("dot files") unless the pattern explicitly begins with a dot
+# Ignore hidden files unless explicitly requested
 set match-hidden-files off
 
-# Show all autocomplete results at once
+# Show all matches immediately
+set show-all-if-ambiguous on
 set page-completions off
 
-# If there are more than 200 possible completions for a word, ask to show them all
+# Ask if too many matches
 set completion-query-items 200
 
-# Immediately show all possible completions
-set show-all-if-ambiguous on
+# Add "/" after symlinked directories
+set mark-symlinked-directories on
 
-# Show extra file information when completing, like ls -F does
+# Don't expand ~ during completion
+set expand-tilde off
+
+# Show file type indicators (like ls -F)
 set visible-stats on
 
 # Be more intelligent when autocompleting by also looking at the text after the cursor. For example, when the current
+
 # line is "cd ~/src/mozil", and the cursor is on the "z", pressing Tab will not autocomplete it to "cd ~/src/mozillail",
+
 # but to "cd ~/src/mozilla". (This is supported by the Readline used by Bash 4.)
+
 set skip-completed-text on
 
-# Use the text that has already been typed as the prefix for searching through commands (i.e. more intelligent Up/Down behavior)
-"\e[B": history-search-forward
-"\e[A": history-search-backward
+# ------------------------------
+# 2. Completion keybindings
+# ------------------------------
 
-# Try to stay at the same position when moving through the history
+# Shift+Tab → cycle backwards
+"\e[Z": menu-complete
+
+# ------------------------------
+# 3. History navigation
+# ------------------------------
+
+# Search history based on current input
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+
+# Keep cursor position when navigating history
 set history-preserve-point on
 
+# ------------------------------
+# 4. Line editing / keybindings
+# ------------------------------
 
-#
-# Line editing
-#
-
+# UTF-8 support
 # Allow UTF-8 input and output, instead of showing them like $'\0123\0456'
+
 set input-meta on
 set output-meta on
 set convert-meta off
 
-# Delete for wonky terminals
+# Delete key fix (for weird terminals)
 "\e[3~": delete-char
 
-# Home/End
+# Home / End keys
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line
 
+# ------------------------------
+# 5. Misc
+# ------------------------------
 
-#
-# Misc
-#
-
+# Disable bell
 set bell-style none

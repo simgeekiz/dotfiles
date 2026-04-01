@@ -7,7 +7,7 @@ venv() {
   for d in .venv .env venv env; do
     if [ -f "$d/bin/activate" ]; then
       . "$d/bin/activate"
-      printf '%s\n' "Activated $d"
+  
       return 0
     fi
   done
@@ -38,4 +38,18 @@ mkvenv() {
   if command -v pip >/dev/null 2>&1; then
     python3 -m pip install --upgrade pip
   fi
+}
+
+# Environment control
+activate() { venv "$@"; }
+
+deac() {
+  deactivate 2>/dev/null || true
+}
+
+jnotescr() {
+  screen -S jnote bash -c "activate; jupyter notebook"
+}
+jlabscr() {
+  screen -S jlab bash -c "activate; jupyter lab"
 }
