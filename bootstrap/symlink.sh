@@ -41,7 +41,7 @@ main() {
 
   case "$CURRENT_SHELL" in
     zsh)
-      set -- zshrc zprofile
+      set -- zshrc zshenv
       DIR="zsh"
       ;;
     bash)

@@ -8,7 +8,6 @@
 # License: MIT
 # https://github.com/simgeekiz/dotfiles
 
-# DONE
 # function to install fonts
 install_fonts() {
   # This script installs custom fonts from a specified source directory to the target font directory.
@@ -78,7 +77,6 @@ install_fonts() {
 }
 
 
-# DONE
 # Function to install powerlevel10k and create a symbolic link
 install_p10k() {
   printf '%s\n' "🌌 Installing Powerlevel10k..."
@@ -104,7 +102,6 @@ install_p10k() {
 }
 
 
-# DONE
 # Function to install a .deb package
 install_deb() {
   app="$1"
@@ -133,7 +130,6 @@ install_deb() {
 }
 
 
-# DONE
 install_code() {
   # Installs Visual Studio Code and extensions
   printf '%s\n' "🧩 Installing Visual Studio Code..."
@@ -220,7 +216,6 @@ install_code() {
 }
 
 
-# DONE
 # Function to install GUI applications
 install_gui() {
   # List of GUI apps in "name|method|url" format
@@ -362,7 +357,7 @@ install_cli() {
   printf '%s\n' "🔨 Installing CLI tools from apt.txt..."
   
   # --- Check if package list exists ---
-  file="$HOME/.dotfiles/packages/apt.txt"
+  file="$HOME/.dotfiles/bootstrap/apt.txt"
   if [ -f "$file" ]; then
     while IFS= read -r pkg; do
       case $pkg in
@@ -382,39 +377,20 @@ install_cli() {
   sudo apt clean || printf '%s\n' "❗ Failed to clean apt cache"
 }
 
+
 install_mac_gui() {
   printf '%s\n' "☕️ Installing Homebrew dependencies... 🏡 Setting up GUI apps..."
-  brew bundle install --file="$HOME/.dotfiles/packages/Brewfile"
+  brew bundle install --file="$HOME/.dotfiles/bootstrap/Brewfile"
 }
+
 
 install_mac_cli() {
   # to install only CLI tools (strip cask lines)
   printf '%s\n' "☕️ Installing CLI tools and libraries... 📝 Skipping GUI apps..."
-  grep "^brew " "$HOME/.dotfiles/packages/Brewfile" > "$HOME/.dotfiles/packages/Brewfile.cli"
-  brew bundle install --file="$HOME/.dotfiles/packages/Brewfile.cli"
-  rm -f "$HOME/.dotfiles/packages/Brewfile.cli"
+  grep "^brew " "$HOME/.dotfiles/bootstrap/Brewfile" > "$HOME/.dotfiles/bootstrap/Brewfile.cli"
+  brew bundle install --file="$HOME/.dotfiles/bootstrap/Brewfile.cli"
+  rm -f "$HOME/.dotfiles/bootstrap/Brewfile.cli"
 }
-
-# newfun() {
-#   echo "install 1, this have to run there is no return yet"
-#   # return 1
-
-#   if [ ! -f "$HOME/.dotfiles/plan/fail" ]; then
-#       printf "❗ no file\n"
-#       return 1  
-#   fi
-
-#   echo "install 4, this does not need to run"
-# }
-
-# newfun
-
-# echo "install 5 outside This needs to run after function fail"
-# [ -f "$HOME/.dotfiles/plan/fail" ] || { 
-#     printf "❗ no file\n"
-#     # return 1
-# }
-# echo "install 6 outside. I want this to run after fail"
 
 main() {
   case "$(uname -s)" in

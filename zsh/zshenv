@@ -1,9 +1,11 @@
-# ~/.dotfiles/zsh/env.zsh
+# ~/.zshenv
 # Zsh environment variables
-# Managed by: ~/.dotfiles/zsh/zshrc or zprofile
+# Managed by: ~/.zshenv
 # Author: Simge Ekiz
 # License: MIT
 
+# environment variables
+export LANG="en_US.UTF-8"
 export EDITOR="nano"
 export PAGER="less"
 export VIRTUAL_ENV_DISABLE_PROMPT=1

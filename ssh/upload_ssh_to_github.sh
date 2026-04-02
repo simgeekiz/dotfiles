@@ -41,43 +41,47 @@ check_GitHub_CLI() {
   esac
 }
 
-# If no key exists, generate a new one
-if ! print_existing_ssh_key; then # Check for existing SSH keys. 
-  echo "🔐 No SSH key found. Generating a new one..."
-  printf "📧 Enter your email for the SSH key: "
-  read EMAIL
+main() {
+  # If no key exists, generate a new one
+  if ! print_existing_ssh_key; then # Check for existing SSH keys. 
+    echo "🔐 No SSH key found. Generating a new one..."
+    printf "📧 Enter your email for the SSH key: "
+    read EMAIL
 
-  # Generating a new SSH key
-  ssh-keygen -t ed25519 -C "$EMAIL" 
+    # Generating a new SSH key
+    ssh-keygen -t ed25519 -C "$EMAIL" 
 
-  # Adding your SSH key to the ssh-agent
-  eval "$(ssh-agent -s)" # Start the ssh-agent
-  ssh-add "$SSHDIR/id_ed25519"
- 
-  echo "✅ SSH key generated and added to the ssh-agent."
-fi
+    # Adding your SSH key to the ssh-agent
+    eval "$(ssh-agent -s)" # Start the ssh-agent
+    ssh-add "$SSHDIR/id_ed25519"
+  
+    echo "✅ SSH key generated and added to the ssh-agent."
+  fi
 
-# Adding a new SSH key to your account
-# Detect the most recent or relevant SSH public key
-PUBKEY=$(find "$HOME/.ssh" -type f -name "*.pub" | grep -e 'id_(ed25519|ecdsa|rsa)\.pub' | head -n 1)
+  # Adding a new SSH key to your account
+  # Detect the most recent or relevant SSH public key
+  PUBKEY=$(find "$HOME/.ssh" -type f -name "*.pub" | grep -e 'id_(ed25519|ecdsa|rsa)\.pub' | head -n 1)
 
-check_GitHub_CLI
+  check_GitHub_CLI
 
-# Authenticate with GitHub CLI & Upload to GitHub
-if ! gh auth status >/dev/null 2>&1; then
-  echo "🔐 Authenticating GitHub CLI..."
-  gh auth login
-fi
+  # Authenticate with GitHub CLI & Upload to GitHub
+  if ! gh auth status >/dev/null 2>&1; then
+    echo "🔐 Authenticating GitHub CLI..."
+    gh auth login
+  fi
 
-# Check if SSH connection to GitHub works
-if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-  echo "✅ SSH authentication to GitHub succeeded."
-  # Upload the public key to GitHub
-  KEY_TITLE="$USER ($(hostname)) - $(date +%Y-%m-%d)"
+  # Check if SSH connection to GitHub works
+  if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    echo "✅ SSH authentication to GitHub succeeded."
+    # Upload the public key to GitHub
+    KEY_TITLE="$USER ($(hostname)) - $(date +%Y-%m-%d)"
 
-  if gh ssh-key add "$PUBKEY" --title "$KEY_TITLE" 2>&1 | tee /tmp/gh_output.printf '%s\n' | grep -q "key is already in use"; then
-    echo "⚠️  SSH key is already in use on GitHub. Skipping upload."
-  else
-    echo "🔑 SSH key uploaded to GitHub with title: $KEY_TITLE"
-  fi  
-fi
+    if gh ssh-key add "$PUBKEY" --title "$KEY_TITLE" 2>&1 | tee /tmp/gh_output.printf '%s\n' | grep -q "key is already in use"; then
+      echo "⚠️  SSH key is already in use on GitHub. Skipping upload."
+    else
+      echo "🔑 SSH key uploaded to GitHub with title: $KEY_TITLE"
+    fi  
+  fi
+}
+
+main "$@"

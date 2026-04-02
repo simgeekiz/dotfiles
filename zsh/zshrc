@@ -13,8 +13,10 @@ source_if_exists() {
   [[ -r "$1" ]] && source "$1"
 }
 
-### === Load Env and Path === ###
-[[ -z "$ZPROFILE_LOADED" ]] && source_if_exists "$HOME/.dotfiles/zsh/zprofile"
+### === Load Path === ###
+typeset -U path
+# Prepend dotfiles bin
+[[ -d "$HOME/.dotfiles/bin" ]] && path=("$HOME/.dotfiles/bin" $path)
 
 ### === Load Config === ###
 source_if_exists "$HOME/.dotfiles/zsh/config.zsh"
