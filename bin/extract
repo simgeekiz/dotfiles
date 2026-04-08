@@ -1,30 +1,94 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 #
-# Usage: extract <file>
 # Description: extracts files / mounts disk images
-# Note: .dmg/hdiutil is macOS-specific.
-#
+# Usage: extract <file>
 # credit: http://nparikh.org/notes/zshrc.txt
-extract () {
-    if [ -f $1 ]; then
-        case $1 in
-            *.tar.bz2)  tar -jxvf $1                        ;;
-            *.tar.gz)   tar -zxvf $1                        ;;
-            *.bz2)      bunzip2 $1                          ;;
-            *.dmg)      hdiutil mount $1                    ;;
-            *.gz)       gunzip $1                           ;;
-            *.tar)      tar -xvf $1                         ;;
-            *.tbz2)     tar -jxvf $1                        ;;
-            *.tgz)      tar -zxvf $1                        ;;
-            *.zip)      unzip $1                            ;;
-            *.ZIP)      unzip $1                            ;;
-            *.pax)      cat $1 | pax -r                     ;;
-            *.pax.Z)    uncompress $1 --stdout | pax -r     ;;
-            *.rar)      unrar x $1                          ;;
-            *.Z)        uncompress $1                       ;;
-            *)          echo "'$1' cannot be extracted/mounted via extract()" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
+#
+# Author: Simge Ekiz
+# License: MIT
+
+set -euo pipefail
+
+script_name="${0##*/}"
+
+# === Usage ===
+usage() {
+  cat <<EOF
+Usage: $script_name [options] <file1> [file2 ...]
+
+Options:
+  --help, -h     Show this help message
+
+Supported file types:
+  .tar.bz2 .tar.gz .bz2 .dmg .gz .tar .tbz2 .tgz .zip .ZIP .pax .pax.Z .rar .Z
+
+Examples:
+  $script_name archive.tar.gz
+  $script_name file1.zip file2.tgz
+EOF
 }
+
+parse_args(){
+  # === Parse arguments ===
+  if [[ $# -eq 0 ]]; then
+    echo "❗ No file specified"
+    usage
+    exit 1
+  fi
+
+  files=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      -*)
+        echo "❗ Unknown option: $1"
+        usage
+        exit 1
+        ;;
+      *)
+        files+=("$1")   # Collect files
+        ;;
+    esac
+    shift
+  done
+}
+
+# === Function to extract a single file ===
+extract_file() {
+  local file="$1"
+  
+  # === Check file existence ===
+  if [[ ! -f "$file" ]]; then
+    echo "❗ '$file' is not a valid file"
+    return
+  fi
+
+  case "$file" in
+    *.tar.bz2|*.tbz2)  tar -jxvf "$file" ;;
+    *.tar.gz|*.tgz)    tar -zxvf "$file" ;;
+    *.tar)             tar -xvf "$file" ;;
+    *.bz2)             bunzip2 "$file" ;;
+    *.gz)              gunzip "$file" ;;
+    *.zip|*.ZIP)       unzip "$file" ;;
+    *.dmg)             hdiutil mount "$file" ;;
+    *.pax)             pax -r < "$file" ;;
+    *.pax.Z)           uncompress "$file" --stdout | pax -r ;;
+    *.rar)             unrar x "$file" ;;
+    *.Z)               uncompress "$file" ;;
+    *) echo "❗ '$file' cannot be extracted/mounted via $script_name" ;;
+  esac
+}
+
+main() {
+  parse_args "$@"
+
+  # === Loop through all files ===
+  for f in "${files[@]}"; do
+    extract_file "$f"
+  done
+}
+
+main "$@"

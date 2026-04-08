@@ -119,5 +119,5 @@ main() {
 main "$@" 
 
 # === # Autostart === 
-# sudo rm -rf $HOME/.config/autostart/
-# sudo ln -sfn $HOME/.dotfiles/autostart/ $HOME/.config/autostart
+# rm -rf $HOME/.config/autostart/
+# ln -sfn $HOME/.dotfiles/autostart/ $HOME/.config/autostart

@@ -1,12 +1,12 @@
-#!/usr/bin/env zsh
-# ---
-# Author: Simge Ekiz
-# ---
-# A quick little indicator for battery status on your Mac laptop, suitable for
-# display in your prompt.
+#!/usr/bin/env bash
 #
+# A quick little indicator for battery status on your Mac laptop, suitable for display in your prompt.
 # Usage: battery-status
 #
+# Author: Simge Ekiz
+# License: MIT
+
+set -euo pipefail
 
 RED="\033[31m"
 GREEN="\033[32m"
@@ -14,25 +14,83 @@ ORANGE="\033[38;5;214m"
 YELLOW="\033[33m"
 RESET="\033[0m"
 
-case "$(uname -s)" in
-  Darwin*)
-    # Check if pmset command is available
-    if ! command -v pmset &> /dev/null; then
-      echo "❗ pmset command not found. Please ensure you are running this on a macOS system."
-      exit 1
-    fi
+usage() {
+  cat <<EOF
+Usage: battery-status [options]
 
-    # Get the battery status using pmset
-    battery_status=$(pmset -g batt)
-    # AC status (power source)
-    ac_status=$([[ "$battery_status" == *"AC Power"* ]] && echo "🔌 On AC" || echo "🔋 On Battery")
-    # Charging state (charging, discharging, charged)
-    charging_status=$(echo "$battery_status"  | grep -oE 'charging|discharging|charged')
-    # Extract battery percentage
-    battery_capacity=$(echo "$battery_status"  | grep -Eo '[0-9]{1,3}%')
-    percent_num=${battery_capacity%\%}  # Strip %
+Options:
+  -h, --help        Show this help message
+  -s, --short       Short output (minimal format)
+
+Description:
+  Displays battery status for macOS and Linux systems.
+
+Examples:
+  battery-status
+  battery-status --short
+EOF
+}
+
+parse_args() {
+  # Defaults
+  SHORT=0
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      -s|--short)
+        SHORT=1
+        shift
+        ;;
+      *)
+        printf "❗ Unknown option: %s\n\n" "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+  done
+}
+
+macos_battery_info() {
+  # Check if pmset command is available
+  if ! command -v pmset &> /dev/null; then
+    echo "❗ pmset command not found. Please ensure you are running this on a macOS system."
+    return 1
+  fi
+
+  # Get the battery status using pmset
+  local battery_status
+  if ! battery_status=$(pmset -g batt 2>/dev/null); then
+    printf "❗ Failed to read battery status\n" >&2
+    return 1
+  fi
+
+  # Defaults (avoid unbound vars with set -u)
+  local ac_status="🔋 On Battery"
+  local charging_status="unknown"
+  local battery_capacity="?"
+  local percent_num=0
+  local color="$RESET"
+  local time_remaining="⌛️"
+
+  # AC status (power source)
+  [[ "$battery_status" == *"AC Power"* ]] && ac_status="🔌 On AC"
+
+  # Charging state (safe against grep failure)
+  charging_status=$(grep -Eo 'charging|discharging|charged' <<<"$battery_status" 2>/dev/null || printf "unknown")
+
+ # Battery percentage
+  if battery_capacity=$(grep -Eo '[0-9]{1,3}%' <<<"$battery_status" 2>/dev/null); then
+    percent_num=${battery_capacity%\%}
+  fi
+
+  # Color selection (guard arithmetic)
+  if [[ "$percent_num" =~ ^[0-9]+$ ]]; then
     if (( percent_num <= 20 )); then
-      color=$RED 
+      color=$RED
     elif (( percent_num <= 50 )); then
       color=$ORANGE
     elif (( percent_num <= 70 )); then
@@ -40,60 +98,126 @@ case "$(uname -s)" in
     else
       color=$GREEN
     fi
-    # Extract time remaining if present
-    time_remaining=$(echo "$battery_status" |
-      tail -1 |
-      cut -f2 |
-      awk -F"; " '{print $3}' |
-      cut -d' ' -f1
-    )
+  fi
 
-    # Normalize cases with no estimate
-    if [[ "$time_remaining" == *"(no"* || "$time_remaining" == *"not"* ]]; then
-      time_remaining='⌛️'
-    elif [[ "$time_remaining" == "0:00" ]]; then
-      time_remaining='⚡️'
-    else
-      time_remaining="⌛️ $time_remaining"
-    fi
+  # Time remaining
+  local raw_time
+  raw_time=$(grep -Eo '[0-9]+:[0-9]+' <<<"$battery_status" 2>/dev/null || true)
 
-    # Final output
-    echo "$ac_status - $charging_status (${color} $battery_capacity ${RESET}) - $time_remaining"
+  if [[ -z "$raw_time" ]]; then
+    time_remaining="⌛️"
+  elif [[ "$raw_time" == "0:00" ]]; then
+    time_remaining="⚡️"
+  else
+    time_remaining="⌛️ $raw_time"
+  fi
 
-    ;;
-  Linux*)
-    # Check if the battery and AC paths exist 
-    BAT_PATH="/sys/class/power_supply/BAT0"
-    AC_PATH="/sys/class/power_supply/AC"
-    if [[ ! -d $BAT_PATH || ! -d $AC_PATH ]]; then
-      echo "❗ This machine does not have a battery or AC power supply information available."
-      exit 1
-    fi
+  # Short output
+  if [[ "${SHORT:-0}" -eq 1 ]]; then
+    printf "%s%%\n" "$percent_num"
+    return 0
+  fi
 
-    # Extract charging state (Charging, Discharging, Full)
-    charging_status=$(cat "$BAT_PATH/status" 2>/dev/null)
-    # Extract battery percentage
-    battery_capacity=$(cat "$BAT_PATH/capacity" 2>/dev/null)
-    if (( battery_capacity <= 20 )); then
-      color=$RED 
-    elif (( battery_capacity <= 50 )); then
+  # Final output (no color bleed)
+  printf "%s - %s (%b%s%b) - %s\n" \
+    "$ac_status" \
+    "$charging_status" \
+    "$color" \
+    "$battery_capacity" \
+    "$RESET" \
+    "$time_remaining"
+}
+
+linux_battery_info(){
+  # Check if the battery and AC paths exist 
+  # Find battery path safely
+  local BAT_PATH=""
+  local AC_PATH=""
+ 
+  for p in /sys/class/power_supply/BAT*; do
+    [[ -d "$p" ]] && BAT_PATH="$p" && break
+  done
+
+  for p in /sys/class/power_supply/A*; do
+    [[ -d "$p" ]] && AC_PATH="$p" && break
+  done
+
+  if [[ -z "$BAT_PATH" ]]; then
+    printf "❗ No battery found\n" >&2
+    return 1
+  fi
+
+  # Defaults (safe with set -u)
+  local charging_status="unknown"
+  local battery_capacity="?"
+  local percent_num=0
+  local ac_online=0
+  local ac_status="🔋 On Battery"
+  local color="$RESET"
+
+  # Read charging status safely
+  if [[ -r "$BAT_PATH/status" ]]; then
+    charging_status=$(<"$BAT_PATH/status")
+  fi
+
+  # Read capacity safely
+  if [[ -r "$BAT_PATH/capacity" ]]; then
+    battery_capacity=$(<"$BAT_PATH/capacity")
+    percent_num="$battery_capacity"
+  fi
+
+  # Validate number before arithmetic
+  if [[ "$percent_num" =~ ^[0-9]+$ ]]; then
+    if (( percent_num <= 20 )); then
+      color=$RED
+    elif (( percent_num <= 50 )); then
       color=$ORANGE
-    elif (( battery_capacity <= 70 )); then
+    elif (( percent_num <= 70 )); then
       color=$YELLOW
     else
       color=$GREEN
     fi
-    # Read AC power online status (1 if plugged in, 0 if not)
-    ac_online=$(cat "$AC_PATH/online" 2>/dev/null)
-    # Fancy output for AC status (power source)
-    ac_status=$([[ "$ac_online" -eq 1 ]] && echo "🔌 On AC" || echo "🔋 On Battery")
+  fi
 
-    # Final output
-    echo "$ac_status - $charging_status (${color} $battery_capacity ${RESET})"
-    ;;
-  *)
-    echo "❗ We do not have battery information for this $(uname) system. Unsupported OS"
-    exit 1
-    ;;
-esac
+  # Read AC status safely (1 if plugged in, 0 if not)
+  if [[ -n "$AC_PATH" && -r "$AC_PATH/online" ]]; then
+    ac_online=$(<"$AC_PATH/online")
+  fi
+  # Fancy output for AC status (power source)
+  if [[ "$ac_online" == "1" ]]; then
+    ac_status="🔌 On AC"
+  fi
 
+  # Short output
+  if [[ "${SHORT:-0}" -eq 1 ]]; then
+    printf "%s%%\n" "$percent_num"
+    return 0
+  fi
+
+  # Output (no color bleed)
+  printf "%s - %s (%b%s%%%b)\n" \
+    "$ac_status" \
+    "$charging_status" \
+    "$color" \
+    "$battery_capacity" \
+    "$RESET"
+}
+
+main() {
+  parse_args "$@"
+
+  case "$(uname -s)" in
+    Darwin*)
+      macos_battery_info
+      ;;
+    Linux*)
+      linux_battery_info
+      ;;
+    *)
+      printf "❗ Unsupported OS: %s\n" "$(uname -s)" >&2
+      return 1
+      ;;
+  esac
+}
+
+main "$@"

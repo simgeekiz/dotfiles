@@ -16,21 +16,47 @@ USE_ZSH=false
 CURRENT_SHELL=${SHELL##*/}
 CURRENT_SHELL=${CURRENT_SHELL:-sh}
 
+has_sudo() {
+  # Check if sudo command exists
+  if ! command -v sudo >/dev/null 2>&1; then
+    return 1  # false, sudo not installed
+  fi
+
+  # Check if user can sudo non-interactively (passwordless)
+  if sudo -n true 2>/dev/null; then
+    return 0  # true, sudo works without password
+  fi
+
+  # User exists in sudoers but requires password
+  # Optional: check if user can run sudo at all
+  if sudo -n -l >/dev/null 2>&1; then
+    return 0  # true, user can sudo (but password required)
+  fi
+
+  # No sudo access at all
+  return 1
+}
 
 install_package() {
+  # Check for sudo first
+  if ! has_sudo; then
+    printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
+    return 1
+  fi
+
   pkg=$1
-  if [ -f /etc/debian_version ]; then
-    sudo apt install -y "$pkg" || warn "Failed to install $pkg (apt)"
-  elif [ -f /etc/redhat-release ]; then
-    if command -v dnf >/dev/null 2>&1; then
-      sudo dnf install -y "$pkg" || warn "Failed to install $pkg (dnf)"
-    else
-      sudo yum install -y "$pkg" || warn "Failed to install $pkg (yum)"
-    fi
-  elif [ -f /etc/arch-release ]; then
-    sudo pacman -S --noconfirm "$pkg" || warn "Failed to install $pkg (pacman)"
+  if command -v apt >/dev/null 2>&1; then
+    sudo apt install -y "$pkg" || printf '%s\n' "Failed to install $pkg (apt)"
+  elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y "$pkg" || printf '%s\n' "Failed to install $pkg (dnf)"
+  elif command -v yum >/dev/null 2>&1; then
+    sudo yum install -y "$pkg" || printf '%s\n' "Failed to install $pkg (yum)"
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm "$pkg" || printf '%s\n' "Failed to install $pkg (pacman)"
+  # elif command -v zypper >/dev/null 2>&1; then
+  #   sudo zypper install -y "$pkg" || printf '%s\n' "Failed to install $pkg (zypper)"
   else
-    printf '%s\n' "❗ Unsupported OS: $(uname -s)"
+    printf '%s\n' "❗ Unsupported OS: $(uname -s)" >&2
     exit 1
   fi
 }
@@ -52,15 +78,24 @@ ask_for_zsh() {
 
 # --- macOS setup ---
 setup_macos() {
-  printf '%s\n' "🍏 Platform detected as macOS. Installing accordingly."
+  printf '%s\n' "🍏 Platform detected as macOS."
+  # Prompt user 
+  printf "🛠️  Do you want to do the installation and update? (y/N) "
+  read answer
 
+  # Normalize to lowercase 
+  answer=$(printf "%s" "$answer" | tr '[:upper:]' '[:lower:]')
+  
+  case "$answer" in
+  y|yes)
+        
     # Install Homebrew if missing
     if ! command -v brew >/dev/null 2>&1; then 
       printf '%s\n' "🫖 Installing Homebrew..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || warn "Homebrew install failed"
 
       # Set up brew environment for current shell session
-     [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+      [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     
     # Install Git (if missing)
@@ -72,27 +107,49 @@ setup_macos() {
     if [ "$USE_ZSH" = true ]; then
       command -v zsh >/dev/null 2>&1 || brew install zsh || warn "zsh install failed"
     fi
+    ;;
+    *)
+      printf '%s\n' "⏭️ Skipping installation."
+    ;;
+  esac
 }
 
 # --- Linux setup ---
 setup_linux() {
-  printf '%s\n' "🌲 Platform detected as Linux. Installing accordingly."
-
-  command -v sudo >/dev/null 2>&1 || {
-    printf '%s\n' "❗ sudo is required"
+  printf '%s\n' "🌲 Platform detected as Linux."
+  
+  # Check for sudo first
+  if ! has_sudo; then
+    printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
     return 1
-  }
-
-  if [ -f /etc/debian_version ]; then
-    sudo apt update || warn "apt update failed"
   fi
 
-  command -v git >/dev/null 2>&1 || install_package git
-  command -v curl >/dev/null 2>&1 || install_package curl
+  # Prompt user 
+  printf "🛠️  Do you want to do the installation and update? (y/N) "
+  read answer
 
-  if [ "$USE_ZSH" = true ]; then
-    command -v zsh >/dev/null 2>&1 || install_package zsh
-  fi
+  # Normalize to lowercase (portable way)
+  answer=$(printf "%s" "$answer" | tr '[:upper:]' '[:lower:]')
+
+  case "$answer" in
+    y|yes)
+        
+      if [ -f /etc/debian_version ]; then
+        sudo apt update || warn "apt update failed"
+      fi
+
+      command -v git >/dev/null 2>&1 || install_package git
+      command -v curl >/dev/null 2>&1 || install_package curl
+
+      if [ "$USE_ZSH" = true ]; then
+        command -v zsh >/dev/null 2>&1 || install_package zsh
+      fi
+      ;;
+    *)
+      printf '%s\n' "⏭️ Skipping installation."
+      ;;
+  esac
+
 }
 
 # --- SSH setup ---
@@ -128,11 +185,18 @@ clone_dotfiles() {
 
 # --- Zsh setup ---
 setup_zsh() {
+
+  # Decide which shell to use
+  RESTART_SHELL="${SHELL:-/bin/sh}"
   if [ "$USE_ZSH" = true ]; then
+    # Check for sudo first
+    if ! has_sudo; then
+      printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
+      return 1
+    fi
+
     ZSH_PATH=$(command -v zsh)
-    # Decide which shell to use
-    RESTART_SHELL="${SHELL:-/bin/sh}"
-    
+
     # Add Zsh to /etc/shells if not present
     if [ -n "$ZSH_PATH" ]; then
       RESTART_SHELL="$ZSH_PATH"
@@ -169,7 +233,7 @@ main() {
     Darwin*) setup_macos;;
     Linux*) setup_linux;;
     *)
-      printf '%s\n' "❗ Unsupported OS: $(uname -s)"
+      printf '%s\n' "❗ Unsupported OS: $(uname -s)" >&2
       exit 1
       ;;
   esac

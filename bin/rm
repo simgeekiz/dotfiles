@@ -1,59 +1,139 @@
 #!/usr/bin/env zsh
-# ---
-# Author: Simge Ekiz
-# ---
+#
 # This script is a replacement for the standard `rm` command.
 # It prompts the user for confirmation before deleting files or directories.
 # It is designed to be used as a safer alternative to the `rm` command.
-# Usage: rm [options] <file1> <file2> ...
 # Options:
 #   -f, --force    Ignore nonexistent files and never prompt    
 #   -i, --interactive  Prompt before every removal
 #   -r, --recursive  Remove directories and their contents recursively
 #
 # Usage:  rm [options] <file1> <file2> ...
+#
+# Author: Simge Ekiz
+# License: MIT
 
+script_name="${0##*/}"
+
+# === Usage ===
+usage() {
+  cat <<EOF
+Usage: $script_name [options] <file1> [file2 ...]
+
+Options:
+  --help, -h        Show this help message
+  --dry-run, -n     Show what would be deleted (no action)
+  --verbose, -v     Show detailed output
+
+Description:
+  A safer wrapper around rm that asks for confirmation
+  before deleting files or directories.
+
+Examples:
+  $script_name file.txt
+  $script_name -r mydir
+  $script_name --dry-run *.log
+  $script_name -rv mydir
+EOF
+}
+
+# === Globals ===
 has_dir=0
 # initialize both arrays explicitly
-args=()
+extra_args=()
 files=()
+DRY_RUN=false
+VERBOSE=false
 
-# Separate flags and file args
-for arg in "$@"; do
-  # args+=("$arg")
-   # Skip flags when checking for directories(skip flags like -f, -r, etc.)
-  [[ "$arg" == -* ]] && continue
-  # add only actual file/dir arguments
-  files+=("$arg")  
-  # Check if the argument is a directory
-  [[ -d "$arg" ]] && has_dir=1
-done
+# === Parse arguments ===
+parse_args() {
+  if [[ $# -eq 0 ]]; then
+    echo -e "\e[31m[Error]\e[0m No arguments provided."
+    usage
+    exit 1
+  fi
 
-# If no valid args remain, exit
-if [[ ${#files[@]} -eq 0 ]]; then
-  echo "\e[31m[Error]\e[0m No valid files or directories to delete."
-  exit 1
-fi
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      --dry-run|-n)
+        DRY_RUN=true
+        ;;
+      --verbose|-v)
+        VERBOSE=true
+        ;;
+      -*)
+        extra_args+=("$1")   # pass-through flags like -r, -f
+        ;;
+      *)
+        files+=("$1")
+        [[ -d "$1" ]] && has_dir=1
+        ;;
+    esac
+    shift
+  done
 
-if [ $has_dir -eq 1 ]; then
-  echo -e "\e[31m[Warning]\e[0m You are about to delete a directory!"
-fi
+  # If no valid files, exit
+  if [[ ${#files[@]} -eq 0 ]]; then
+    echo -e "\e[31m[Error]\e[0m No valid files or directories."
+    exit 1
+  fi
+}
 
-while true; do
-  echo -n "Are you sure you want to delete: "
-  printf '"%s" ' "${files[@]}"
-  echo -n "? (y/n) "
-  read -r answer
+# === Confirm deletion ===
+confirm() {
+  if [[ "$DRY_RUN" == true ]]; then
+    return 0   # skip confirmation in dry-run
+  fi
 
-  case "$answer" in
-    [Yy]|[Yy][Ee][Ss])
-      echo -e "\e[32mDeleting...\e[0m"
-      # /bin/rm "${args[@]}"
-      /bin/rm "$@"
-      break ;;
-    [Nn]|[Nn][Oo])
-      echo -e "\e[32mAborted.\e[0m"
-      break ;;
-    *) echo "Please answer yes or no." ;;
-  esac
-done
+  if [ $has_dir -eq 1 ]; then
+    echo -e "\e[31m[Warning]\e[0m You are about to delete a directory!"
+  fi
+
+
+  while true; do
+    echo -n "Are you sure you want to delete: "
+    printf '"%s" ' "${files[@]}"
+    echo -n "? (y/n) "
+    read -r answer
+
+    case "$answer" in
+      [Yy]|[Yy][Ee][Ss]) return 0 ;;
+      [Nn]|[Nn][Oo]) return 1 ;;
+      *) echo "Please answer yes or no." ;;
+    esac
+  done
+
+}
+
+# === Execute deletion ===
+run_rm() {
+  if [[ "$DRY_RUN" == true ]]; then
+    echo -e "\e[34m[Dry Run]\e[0m Would delete:"
+    printf '  "%s"\n' "${files[@]}"
+    return
+  fi
+
+  if [[ "$VERBOSE" == true ]]; then
+    echo -e "\e[32m[Verbose]\e[0m Deleting:"
+    printf '  "%s"\n' "${files[@]}"
+  fi
+
+  /bin/rm "${extra_args[@]}" "${files[@]}"
+}
+
+# === Main ===
+main() {
+  parse_args "$@"
+
+  if confirm; then
+    run_rm
+  else
+    echo -e "\e[33mAborted.\e[0m"
+  fi
+}
+
+main "$@"

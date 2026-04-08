@@ -8,6 +8,28 @@
 # License: MIT
 # https://github.com/simgeekiz/dotfiles
 
+# Function to check if user can use sudo
+has_sudo() {
+  # Check if sudo command exists
+  if ! command -v sudo >/dev/null 2>&1; then
+    return 1  # false, sudo not installed
+  fi
+
+  # Check if user can sudo non-interactively (passwordless)
+  if sudo -n true 2>/dev/null; then
+    return 0  # true, sudo works without password
+  fi
+
+  # User exists in sudoers but requires password
+  # Optional: check if user can run sudo at all
+  if sudo -n -l >/dev/null 2>&1; then
+    return 0  # true, user can sudo (but password required)
+  fi
+
+  # No sudo access at all
+  return 1
+}
+
 # function to install fonts
 install_fonts() {
   # This script installs custom fonts from a specified source directory to the target font directory.
@@ -22,7 +44,7 @@ install_fonts() {
   case "$OS_NAME" in
     Linux) FONT_TARGET="$HOME/.local/share/fonts" ;;
     Darwin) FONT_TARGET="$HOME/Library/Fonts" ;;
-    *) printf '%s\n' "❗ Unsupported OS: $OS_NAME"; exit 1 ;;
+    *) printf '%s\n' "❗ Unsupported OS: $OS_NAME" >&2; exit 1 ;;
   esac
 
   # Check source exists
@@ -106,6 +128,12 @@ install_p10k() {
 install_deb() {
   app="$1"
   url="$2"
+  
+  # Check for sudo first
+  if ! has_sudo; then
+    printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
+    return 1
+  fi
 
   # Create a temporary file safely
   tmpfile=$(mktemp "/tmp/${app}.XXXXXX.deb") || return 1
@@ -131,6 +159,12 @@ install_deb() {
 
 
 install_code() {
+  # Check for sudo first
+  if ! has_sudo; then
+    printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
+    return 1
+  fi
+
   # Installs Visual Studio Code and extensions
   printf '%s\n' "🧩 Installing Visual Studio Code..."
   sudo apt update || printf '%s\n' "❗ Failed to update package lists..."
@@ -218,8 +252,16 @@ install_code() {
 
 # Function to install GUI applications
 install_gui() {
+
+  # Check for sudo first
+  if ! has_sudo; then
+    printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
+    return 1
+  fi
+
   # List of GUI apps in "name|method|url" format
   gui_file=$HOME/.dotfiles/gui-apps.txt
+
 
   if [ ! -f "$gui_file" ]; then
     printf '%s\n' "⚠️ GUI app list not found: $gui_file"
@@ -258,7 +300,6 @@ install_gui() {
 
     case $method in
       deb)
-        # install_deb "$name" "$url" || printf '%s\n' "⚠️ $name installation failed"
         if ! install_deb "$name" "$url"; then
           printf '%s\n' "⚠️ $name installation failed"
         fi
@@ -348,7 +389,11 @@ install_nodejs() {
 
 # Function to install CLI tools and update the system
 install_cli() {
-  # Get operating system
+  # Check for sudo first
+  if ! has_sudo; then
+    printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
+    return 1
+  fi
 
   printf '%s\n' "🔄 Updating system packages..."
   sudo apt update || printf '%s\n' "❗ Failed to update package lists."
@@ -415,7 +460,7 @@ main() {
         ''
       ;;
     *)
-      printf '%s\n' "❗ Unsupported OS: $(uname -s). Please check if you are running this on a supported OS (Linux or macOS)."
+      printf '%s\n' "❗ Unsupported OS: $(uname -s). Please check if you are running this on a supported OS (Linux or macOS)." >&2
       exit 1
       ;;
   esac

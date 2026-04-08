@@ -1,15 +1,112 @@
-#!/usr/bin/env zsh
-# ---
+#!/usr/bin/env bash
+#
+# File: ~/.dotfiles/bin/speedtest
+# Run speedtest-cli (auto-install if missing)
+# Usage: speedtest [options]
+#
 # Author: Simge Ekiz
-# ---
-# This script is a simple wrapper for the speedtest-cli Python script.
-# It downloads the script from the official repository and executes it.
-# It is designed to be a quick and easy way to run a speed test from the command line.
+# License: MIT
 
-# Usage: speedtest
+set -euo pipefail
 
-if [ -f $HOME/.dotfiles/bin/speedtest.py ]; then
-  python3 $HOME/.dotfiles/bin/speedtest.py
-else
-  curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3
-fi
+script_name="${0##*/}"
+
+# === Usage ===
+usage() {
+  cat <<EOF
+Usage: $script_name [options]
+
+Options:
+  --help, -h     Show this help message
+  --install, -i  Force install speedtest-cli
+
+Description:
+  Runs speedtest-cli. If not installed, it will install it
+  using apt (Linux) or brew (macOS).
+
+Examples:
+  $script_name
+  $script_name --simple
+  $script_name --install
+EOF
+}
+
+# === Globals ===
+INSTALL=false
+extra_args=()
+
+# === Parse arguments ===
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      --install|-i)
+        INSTALL=true
+        ;;
+      *)
+        extra_args+=("$1")   # pass to speedtest-cli
+        ;;
+    esac
+    shift
+  done
+}
+
+# === Install function ===
+install_speedtest() {
+  OS="$(uname -s)"
+
+  case "$OS" in
+    Linux*)
+      if command -v apt >/dev/null 2>&1; then
+        echo "[Info] Installing speedtest-cli via apt..."
+        sudo apt update
+        sudo apt install -y speedtest-cli
+      else
+        echo "❗ Unsupported Linux package manager"
+        exit 1
+      fi
+      ;;
+    Darwin*)
+      if command -v brew >/dev/null 2>&1; then
+        echo "[Info] Installing speedtest-cli via Homebrew..."
+        brew install speedtest-cli
+      else
+        echo "❗ Homebrew not found. Please install it first."
+        exit 1
+      fi
+      ;;
+    *)
+      echo "❗ Unsupported OS: $OS" >&2
+      return 1
+      ;;
+  esac
+}
+
+# === Run ===
+run_speedtest() {
+  if command -v speedtest-cli >/dev/null 2>&1; then
+    speedtest-cli "${extra_args[@]}"
+  else
+    echo "[Info] speedtest-cli not found."
+    install_speedtest
+    echo "[Info] Running speedtest..."
+    speedtest-cli "${extra_args[@]}"
+  fi
+}
+
+# === Main ===
+main() {
+  parse_args "$@"
+
+  if [[ "$INSTALL" == true ]]; then
+    install_speedtest
+    exit 0
+  fi
+
+  run_speedtest
+}
+
+main "$@"

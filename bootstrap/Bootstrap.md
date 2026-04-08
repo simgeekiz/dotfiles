@@ -47,7 +47,7 @@ Or **Run the preparation script. (prerequisites.sh):**
 This script does the steps above;
 
 ```
-  $ curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
+  $ curl -o prerequisites.sh https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
   $ sh prerequisites.sh
 
 ```

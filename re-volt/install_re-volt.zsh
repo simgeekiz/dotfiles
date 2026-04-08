@@ -26,7 +26,7 @@ case "$(uname -s)" in
     revolt_launcher_file="$REVOLTDIR/rvgl_launcher.py"
     ;;
   *)
-    echo "❗ Unsupported OS: $(uname -s). Please check if you are running this on a supported OS (Linux or macOS)."
+    printf "❗ Unsupported OS: $(uname -s). Please check if you are running this on a supported OS (Linux or macOS)." >&2
     exit 1
     ;;
 esac
@@ -78,7 +78,7 @@ case "$(uname -s)" in
     python $revolt_launcher_file
     ;;
   *)
-    echo "❗ Unsupported OS: $(uname -s). Please check if you are running this on a supported OS (Linux or macOS)."
+    echo "❗ Unsupported OS: $(uname -s). Please check if you are running this on a supported OS (Linux or macOS)." >&2
     exit 1
     ;;
 esac

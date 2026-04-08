@@ -23,7 +23,7 @@
 - Run the prerequisites script.
 
 ```
-  $ curl -o https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
+  $ curl -o prerequisites.sh https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
   $ sh prerequisites.sh
 ```
 

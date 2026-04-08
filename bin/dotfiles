@@ -1,18 +1,16 @@
-#!/usr/bin/env zsh
-# ---
-# Author: Simge Ekiz
-# ---
-# Pull from repository and check symlinks and the installation
-#  
-# Usage:  dotfiles 
+#!/usr/bin/env bash
 #
+# Pull from repository and check symlinks and the installation
+# Usage: dotfiles 
+#
+# Author: Simge Ekiz
+# License: MIT
 
 # Exit on any failed command
 set -e
 
-# === Parse Arguments ===
 INSTALL=false
-local script_name="${0##*/}"
+script_name="${0##*/}"
 
 # Print usage message.
 usage() {
@@ -25,49 +23,74 @@ usage() {
 EOF
 }
 
-# === Parse arguments ===
-while [[ "$#" -gt 0 ]]; do
-  case "$1" in
-    --help | -h | -help)
-      usage
-      exit 0
-      ;;
-    --install | -i | -install)
-      INSTALL=true
-      ;;
-    *)
-      echo "❌ Unknown option: $1"
-      usage
-      exit 1
-      ;;
-  esac
-  shift
-done
-
-# === Ensure we're in ~/.dotfiles ===
-cd "$HOME/.dotfiles" > /dev/null 2>&1 || {
-  echo "❌ Cannot find ~/.dotfiles directory."
-  exit 1
+parse_args() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --help | -h | -help)
+        usage
+        exit 0
+        ;;
+      --install | -i | -install)
+        INSTALL=true
+        ;;
+      *)
+        echo "❗ Unknown option: $1"
+        usage
+        exit 1
+        ;;
+    esac
+    shift
+  done
 }
-echo "✒️ Pulling changes from GitHub..."
-git pull
 
-# # === Import functions ===
-if [[ -f "$HOME/.dotfiles/functions/core.zsh" ]]; then
-  source "$HOME/.dotfiles/functions/core.zsh"
-fi
+main () {
+  parse_args "$@"
 
-# === Optional: Install software ===
-if [[ "$INSTALL" == true ]]; then
-  if [[ -f "$HOME/.dotfiles/scripts/install.zsh" ]]; then
-    source "$HOME/.dotfiles/scripts/install.zsh"
+  # === Ensure we're in ~/.dotfiles ===
+  cd "$HOME/.dotfiles" > /dev/null 2>&1 || {
+    echo "❗ Cannot find ~/.dotfiles directory."
+    exit 1
+  }
+  echo "✒️ Pulling changes from GitHub..."
+  git pull
+
+  # === Import functions ===
+  if [ -r "$HOME/.dotfiles/bootstrap/helpers.sh" ]; then
+    . "$HOME/.dotfiles/bootstrap/helpers.sh"
+  else
+    printf '%s\n' "⚠️  helpers.sh not found or unreadable"
+    return 1
   fi
-fi
 
-# === Symlink dotfiles ===
-[[ -f "$HOME/.dotfiles/scripts/symlink.zsh" ]] && source "$HOME/.dotfiles/scripts/symlink.zsh"
 
-cd $HOME
+  # === Optional: Install software ===
+  if [[ "$INSTALL" == true ]]; then
+    if [ -r "$HOME/.dotfiles/bootstrap/install.sh" ]; then
+      if type prompt_user >/dev/null 2>&1; then
+        prompt_user "🛠️  Do you want to do installation?" ". \"$HOME/.dotfiles/bootstrap/install.sh\"" ""
+      else
+        printf '%s\n' "⚠️  prompt_user function not found"
+      fi
+    else
+      printf '%s\n' "⚠️  install.sh not found or unreadable."
+    fi
+  fi
 
-echo "🦆 Restarting Terminal"  
-exec $SHELL
+  # === Symlink dotfiles ===
+  if [ -r "$HOME/.dotfiles/bootstrap/symlink.sh" ]; then
+      . "$HOME/.dotfiles/bootstrap/symlink.sh"
+  else
+    printf '%s\n' "⚠️  symlink.sh not found or unreadable."
+  fi
+
+  cd $HOME
+
+  # === Restarting terminal ===
+  if command -v "${SHELL:-/bin/sh}" >/dev/null 2>&1; then
+    printf '%s\n' "🦆 Restarting Terminal"  
+    exec "${SHELL:-/bin/sh}" -l || printf '%s\n' "Could not restart shell. Please restart manually."
+  fi
+
+}
+
+main "$@"

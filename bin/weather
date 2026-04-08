@@ -1,23 +1,109 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
+# File: ~/.dotfiles/bin/weather
 # Show the current weather
-location="${1:-}"
+# Usage: weather
+#
+# Author: Simge Ekiz
+# License: MIT
 
-print "🌞 Fetching weather for ${location:-your location}..."
+set -euo pipefail
 
-if [[ -z "$location" ]]; then
-  raw=$(curl -s "wttr.in?format=%l|%c|%C|%t|%w|%m")
-else
-  raw=$(curl -s "wttr.in/${location// /+}?format=%l|%c|%C|%t|%w|%m")
-fi
+script_name="${0##*/}"
 
-IFS="|" read -r city emoji desc temp wind moon <<< "$raw"
+# === Colors ===
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+MAGENTA="\033[35m"
+CYAN="\033[36m"
+RESET="\033[0m"
+BOLD="\033[1m"
 
-print -P "Today: %B%F{green}${city}%f%b: ${emoji}%F{214}(${desc})%f %F{red}${temp}%f %F{cyan}${wind}%f %F{yellow}Moon:${moon}%f"
+# === Usage ===
+usage() {
+  cat <<EOF
+Usage: $script_name [options] [location]
 
-### --- Notes
-  # %B  -> start bold text
-  # %b  -> end bold text
-  # ${cyan}, ${blue}, ${green}, ${red}, ${yellow}, ${orange}, ${white}, ${reset}
-  # ${reset} clears the color.
-  # ${bold} works for bold text.
-  # ${fg[cyan]} is also valid if you want the fg[] syntax.
+Options:
+  -h, --help        Show this help message
+
+Description:
+  Fetches weather information from wttr.in.
+
+  If no location is provided, it uses your IP-based location.
+
+Examples:
+  $script_name
+  $script_name London
+  $script_name "New York"
+EOF
+}
+
+
+# === Globals ===
+location=""
+extra_args=()
+
+# === Parse arguments ===
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        # First non-flag argument = location
+        if [[ -z "$location" ]]; then
+          location="$1"
+        else
+          extra_args+=("$1")
+        fi
+        ;;
+    esac
+    shift
+  done
+}
+
+# === Fetch weather ===
+fetch_weather() {
+  printf '%s\n' "🌞 Fetching weather for ${location:-your location}..."
+
+  # === Fetch weather ===
+  if [[ -z "$location" ]]; then
+    raw=$(curl -s "wttr.in?format=%l|%c|%C|%t|%w|%m")
+  else
+    raw=$(curl -s "wttr.in/${location// /+}?format=%l|%c|%C|%t|%w|%m")
+  fi
+
+  if [[ -z "$raw" ]]; then
+    echo "❗ Failed to fetch weather data"
+    exit 1
+  fi
+
+  IFS="|" read -r city emoji desc temp wind moon <<< "$raw"
+}
+
+# === Format output ===
+format_weather() {
+  weather=""
+  weather+="${BOLD}${GREEN}${city}${RESET}"
+  weather+=": ${emoji}${MAGENTA}(${desc})${RESET}"
+  weather+=" ${RED}${temp}${RESET}"
+  weather+=" ${CYAN}${wind}${RESET}"
+  weather+=" ${YELLOW}Moon:${moon}${RESET}"
+}
+
+# === Main ===
+main() {
+  parse_args "$@"
+  fetch_weather
+  format_weather
+
+  printf '%b\n' "$weather"
+}
+
+main "$@"
+
+# This is ZSH only
+# print -P "Today: %B%F{green}${city}%f%b: ${emoji}%F{214}(${desc})%f %F{red}${temp}%f %F{cyan}${wind}%f %F{yellow}Moon:${moon}%f"

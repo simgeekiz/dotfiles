@@ -8,6 +8,45 @@
 
 SSHDIR="$HOME/.ssh"
 
+has_sudo() {
+  # Check if sudo command exists
+  if ! command -v sudo >/dev/null 2>&1; then
+    return 1  # false, sudo not installed
+  fi
+
+  # Check if user can sudo non-interactively (passwordless)
+  if sudo -n true 2>/dev/null; then
+    return 0  # true, sudo works without password
+  fi
+
+  # User exists in sudoers but requires password
+  # Optional: check if user can run sudo at all
+  if sudo -l >/dev/null 2>&1; then
+    return 0  # true, user can sudo (but password required)
+  fi
+
+  # No sudo access at all
+  return 1
+}
+
+install_package() {
+  pkg=$1
+  if command -v apt >/dev/null 2>&1; then
+    sudo apt install -y "$pkg" || printf '%s\n' "Failed to install $pkg (apt)"
+  elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y "$pkg" || printf '%s\n' "Failed to install $pkg (dnf)"
+  elif command -v yum >/dev/null 2>&1; then
+    sudo yum install -y "$pkg" || printf '%s\n' "Failed to install $pkg (yum)"
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm "$pkg" || printf '%s\n' "Failed to install $pkg (pacman)"
+  # elif command -v zypper >/dev/null 2>&1; then
+  #   sudo zypper install -y "$pkg" || printf '%s\n' "Failed to install $pkg (zypper)"
+  else
+    printf '%s\n' "❗ Unsupported OS: $(uname -s)" >&2
+    exit 1
+  fi
+}
+
 # 🔍 Function to check existing SSH public key
 print_existing_ssh_key() {
   for key_type in rsa ecdsa ed25519; do
@@ -32,11 +71,18 @@ check_GitHub_CLI() {
       ;;
     Linux)
       # Install GitHub CLI (if missing)
-      command -v gh >/dev/null 2>&1 || install_package gh
+      if ! command -v gh >/dev/null 2>&1; then
+        if has_sudo; then
+          install_package gh 
+        else
+          echo "⚠️ No sudo access. Skipping GitHub CLI installation."
+          echo "ℹ️ You can still use git + SSH without gh."
+        fi
+      fi
       ;;
     *)
-      echo "❗ Unsupported OS for GitHub CLI installation. Please install it manually."
-      exit 1
+      printf "❗ Unsupported OS for GitHub CLI installation. Please install it manually." >&2
+      return 1
       ;;
   esac
 }
@@ -64,23 +110,41 @@ main() {
 
   check_GitHub_CLI
 
-  # Authenticate with GitHub CLI & Upload to GitHub
-  if ! gh auth status >/dev/null 2>&1; then
-    echo "🔐 Authenticating GitHub CLI..."
-    gh auth login
-  fi
-
   # Check if SSH connection to GitHub works
   if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-    echo "✅ SSH authentication to GitHub succeeded."
+    echo "✅ SSH already configured with GitHub. Nothing to do."
+    return
+  fi
+
+  if command -v gh >/dev/null 2>&1; then
     # Upload the public key to GitHub
+    echo "🚀 GitHub CLI detected, uploading key..."
+
     KEY_TITLE="$USER ($(hostname)) - $(date +%Y-%m-%d)"
+
+    # Authenticate with GitHub CLI & Upload to GitHub
+    if ! gh auth status >/dev/null 2>&1; then
+      echo "🔐 Authenticating GitHub CLI..."
+      gh auth login
+    fi
+
+    gh ssh-key add "$PUBKEY" --title "$KEY_TITLE" || \
+      echo "⚠️ Key may already exist."
 
     if gh ssh-key add "$PUBKEY" --title "$KEY_TITLE" 2>&1 | tee /tmp/gh_output.printf '%s\n' | grep -q "key is already in use"; then
       echo "⚠️  SSH key is already in use on GitHub. Skipping upload."
     else
       echo "🔑 SSH key uploaded to GitHub with title: $KEY_TITLE"
     fi  
+  else
+    echo "ℹ️ gh not found, falling back to manual setup."
+    echo "👉 Copy this key and add it to GitHub:"
+    echo "--------------------------------------------------"
+    cat "$PUBKEY"
+    echo "--------------------------------------------------"
+    echo ""
+    echo "🔗 Go to: https://github.com/settings/keys"
+    echo "➕ Click 'New SSH key' and paste the key above."
   fi
 }
 

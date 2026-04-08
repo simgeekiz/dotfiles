@@ -1,52 +1,93 @@
-#!/usr/bin/env zsh
-# Author: Simge Ekiz
-# License: MIT 
+#!/usr/bin/env bash
 #
 # Update script for Linux and MacOS
 # - updates the system packages;  
 # - cleans up unnecessary packages;
+#
+# Author: Simge Ekiz
+# License: MIT 
+#
 
-magenta='\e[1;35m'
-white='\e[0;37m'
+set -euo pipefail
 
-# Since some programs are installed in non-root directories,
-# don't run this script as root to avoid permission conflict.
-if [[ $EUID -eq 0 ]]; then
-    echo "Don't run this script as root"
-    exit 1
-fi
+MAGENTA="\033[0;35m"
+RESET="\033[0m"
+
+script_name="${0##*/}"
+
+# === Usage ===
+usage() {
+  cat <<EOF
+Usage: $script_name [options]
+
+Options:
+  --help, -h       Show this help message
+
+Description:
+  This script updates your system packages and cleans unnecessary packages.
+  Supports apt, dnf, yum, pacman, zypper, and Homebrew (macOS).
+
+Examples:
+  $script_name 
+EOF
+}
 
 update_and_upgrade() {
-  echo "${magenta}⚙️ Updating Package List...${white}"
-  sudo apt update
-
-  echo -e "${magenta}⬆️ Upgrading System Packages (full-upgrade)...${white}"
-  sudo apt full-upgrade -y
-}
-
-# Autoremove unnecessary packages. Clean up the local repository of retrieved package files.
-autoremove() {
-  echo "${magenta}🗑️ Autoremoving Unnecessary Packages...${white}"
-  sudo apt autoremove -y
-  echo "${magenta}🧽 Cleaning Up Local Repository... ${white}"
-  sudo apt clean
-}
-
-case "$(uname)" in
-  Darwin)
+  printf "${MAGENTA} Updating Package List and Upgrading System Packages${RESET}\n"
+  if command -v apt >/dev/null 2>&1; then
+    sudo apt update
+    sudo apt full-upgrade -y
+  elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf check-update -y
+    sudo dnf upgrade -y
+  elif command -v yum >/dev/null 2>&1; then
+    sudo yum check-update -y
+    sudo yum update -y
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -Syu --noconfirm
+  elif command -v zypper >/dev/null 2>&1; then
+    sudo zypper refresh
+    sudo zypper update -y
+  elif command -v brew >/dev/null 2>&1; then
     # Make sure we’re using the latest Homebrew.
     brew update
     # Upgrade any already-installed formulae.
     brew upgrade
-    ;;
-  Linux)
-    update_and_upgrade
-    autoremove
-    ;;
-  *)
-    echo "❌ Unsupported OS: $(uname)"
-    echo "❗ Please check if you are running this on a supported OS (Linux or macOS)."
-    exit 1
-    ;;
-esac
+  else
+    echo "❗ No supported package manager found."
+  fi
+}
 
+# === Parse arguments ===
+parse_args() {
+  if [[ $# -gt 0 ]]; then
+    case "$1" in
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        printf "❗ Unknown option: %s\n\n" "$1" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+  fi
+}
+
+main() {
+  # Since some programs are installed in non-root directories,
+  # don't run this script as root to avoid permission conflict.
+  if [[ $EUID -eq 0 ]]; then
+      echo "Don't run this script as root"
+      exit 1
+  fi
+  
+  parse_args "$@"
+
+  update_and_upgrade
+  # Autoremove unnecessary packages. Clean up the local repository of retrieved package files.
+  clean --packages
+}
+
+main "$@"

@@ -1,77 +1,66 @@
-#!/usr/bin/env zsh
-# ---
-# Author: Simge Ekiz
-# ---
-# For headphone to work properly
+#!/usr/bin/env bash
 #
-# Usage:  turnonheadphones
+# File: ~/.dotfiles/bin/turnonheadphones
+# For headphone to work properly
+# Usage: turnonheadphones
+#
+# Author: Simge Ekiz
+# License: MIT
+
+#  HEADPHONES (functions)
+
+set -euo pipefail
 
 function run_pafile() {
+  command -v nc >/dev/null 2>&1 || { echo "❗ nc not found"; return 1; }
   if [[ -x "$pafile" ]]; then
-    echo
-    while true; do
-      printf "🛠️  Run the script? [Y/n]: "
-      read run_pafile
-      run_pafile=$(echo "$run_pafile" | xargs) # Trim whitespace
-      run_pafile=${run_pafile:-y}  # set default to 'y' if empty
-
-      case "$run_pafile" in
-        y|Y|yes|YES|Yes|YeS|yEs|YEs)
-          bash "$pafile" | nc termbin.com 9999
-          break
-          ;;
-        n|N|no|NO|No|nO ) 
-          echo "Aborted."
-          break
-          ;;
-        * )
-          echo "🎸 Please answer yes [y] or no [n]."
-          ;;
-      esac
-    done
-
+    bash "$pafile" | nc termbin.com 9999
   else
     echo "Script is not executable or not found."
     return 1
   fi
 }
 
-# Check if the script exists and is executable
-pafile="$HOME/.dotfiles/bin/pa-info"
-hash_file="$HOME/.dotfiles/privates/pa-info.sha256"
-expected_hash=$(awk '{print $1}' "$hash_file")
+main() {
+  # Check if the script exists and is executable
+  pafile="$HOME/.dotfiles/privates/pa-info"
+  hash_file="$HOME/.dotfiles/privates/pa-info.sha256"
+  expected_hash=$(awk '{print $1}' "$hash_file")
 
-if [[ ! -e $pafile ]]; then
+  if [[ -e $pafile ]]; then
+    run_pafile
+    return
+  
+  command -v curl >/dev/null 2>&1 || { echo "❗ curl not found"; return 1; }
+  command -v bash >/dev/null 2>&1 || { echo "❗ bash not found"; return 1; }
+
+  echo "Warning: executing remote script\n" 
+
   curl -fsSL "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/raw/master/src/utils/pa-info?inline=false" -o "$pafile"
-  chmod +x $pafile
+  chmod +x "$pafile"
 
-  if [[ ! -s "$pafile" ]]; then
-    echo "Download failed or empty script."
-    rm -f "$pafile"
+  [[ -s "$pafile" ]] || { echo "Download failed or empty script."; rm -f "$pafile"; return 1; }
+
+  # Cross-platform SHA256
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual_hash=$(sha256sum "$pafile" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    actual_hash=$(shasum -a 256 "$pafile" | awk '{print $1}')
+  else
+    echo "❗ No SHA256 utility found (sha256sum or shasum)"
     return 1
   fi
-
-  echo "Contents:"
-  echo "----------------------"
-  head -n 50 "$pafile" # show preview
-  echo "----------------------"
-
-  actual_hash=$(sha256sum "$pafile" | awk '{print $1}')
 
   if [[ "$actual_hash" != "$expected_hash" ]]; then
     echo "⚠️  Hash mismatch!"
     echo "Expected: $expected_hash"
     echo "Actual:   $actual_hash"
     echo "Script may have been tampered with. Aborting."
-    rm -f "$tmpfile"
     return 1
-  else
-    echo "✅ Hash verified. Running script..."
-    run_pafile
-  fi  
-  else
-    run_pafile
-fi
+  fi
 
+  echo "✅ Hash verified. Running script..."
+  run_pafile
+}
 
-
+main "$@"

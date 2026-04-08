@@ -56,13 +56,6 @@ git-clean-branches() {
   done
 }
 
-#  HEADPHONES (functions)
-turnonheadphones() {
-  command -v curl >/dev/null 2>&1 || { printf '%s\n' "curl not found"; return 1; }
-  command -v bash >/dev/null 2>&1 || { printf '%s\n' "bash not found"; return 1; }
-  printf '%s\n' "Warning: executing remote script\n" 
-  curl -fsSL "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/raw/master/src/utils/pa-info?inline=false" | bash
-}
 
 # ALERT (functions)
 # Add an "alert" alias for long running commands.  Use like so: sleep 10; alert

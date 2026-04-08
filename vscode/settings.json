@@ -2,7 +2,7 @@
   "typescript.tsc.autoDetect": "off",
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "true"
+    "source.fixAll.eslint": "true",
   },
   "eslint.validate": ["javascript"],
   "workbench.preferredDarkColorTheme": "Visual Studio Dark",
@@ -24,10 +24,10 @@
   "editor.minimap.enabled": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
@@ -41,27 +41,27 @@
     "markdown": false,
     "scminput": false,
     "jinja-html": false,
-    "python": true
+    "python": true,
   },
   "editor.formatOnSave": true,
   "[astro]": {
-    "editor.defaultFormatter": "astro-build.astro-vscode"
+    "editor.defaultFormatter": "astro-build.astro-vscode",
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
   },
   "python.formatting.provider": "black",
   "python.formatting.blackArgs": ["--line-length", "88"],
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[jinja-html]": {
     "editor.defaultFormatter": "vscode.html-language-features",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "files.associations": {
-    "**/templates/**/*.html": "jinja-html"
+    "**/templates/**/*.html": "jinja-html",
   },
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.js",
@@ -75,8 +75,9 @@
     "*.sqlite3": "${capture}.${extname}-*",
     "*.db3": "${capture}.${extname}-*",
     "*.sdb": "${capture}.${extname}-*",
-    "*.s3db": "${capture}.${extname}-*"
+    "*.s3db": "${capture}.${extname}-*",
   },
   "github.copilot.nextEditSuggestions.enabled": false,
-  "editor.fontSize": 12
+  "editor.fontSize": 12,
+  "claudeCode.preferredLocation": "panel",
 }
