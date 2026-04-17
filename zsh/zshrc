@@ -21,15 +21,30 @@ typeset -U path
 ### === Load Config === ###
 source_if_exists "$HOME/.dotfiles/zsh/config.zsh"
 
-### === NVM (Node Version Manager) setup
-### =========================
-export NVM_DIR="$HOME/.nvm"
-# Load NVM if available
+### === Lazy-load NVM === ###
+lazy_load_nvm() {
+  [[ -s "$NVM_DIR/nvm.sh" ]] || return 1
+
+  unfunction nvm node npm npx lazy_load_nvm 2>/dev/null
+  source "$NVM_DIR/nvm.sh" || return 1
+}
+
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-  # Only load once (idempotent)
-  if ! (( $+functions[nvm] )); then
-    source "$NVM_DIR/nvm.sh"
-  fi
+  nvm() {
+    lazy_load_nvm && nvm "$@"
+  }
+
+  node() {
+    lazy_load_nvm && node "$@"
+  }
+
+  npm() {
+    lazy_load_nvm && npm "$@"
+  }
+
+  npx() {
+    lazy_load_nvm && npx "$@"
+  }
 fi
 
 ### === Import functions
@@ -37,12 +52,12 @@ for file in "$HOME/.dotfiles/functions"/*.sh(N); do
   source "$file"
 done
 
-### === Load Aliases 
+### === Load Aliases
 source_if_exists "$HOME/.dotfiles/zsh/zsh_aliases.zsh"
 source_if_exists "$HOME/.dotfiles/tmux/tmux_aliases.sh"
 source_if_exists "$HOME/.dotfiles/git/git_aliases.sh"
 
-### === Load Key Bindings 
+### === Load Key Bindings
 source_if_exists "$HOME/.dotfiles/zsh/key-bindings.zsh"
 
 ### === Load Completion
@@ -56,14 +71,15 @@ autoload -U add-zsh-hook
 # chpwd hook (nvm) (run on directory change)
 load-nvmrc() {
   # Find desired version
-  local nvm_version desired_node
+  local desired_node latest_node
+
+  lazy_load_nvm >/dev/null 2>&1 || return 0
 
   if [[ -f .nvmrc ]]; then
    # If a .nvmrc file exists, use its version
     desired_node=$(<.nvmrc)
   else
     # Otherwise, automatically use the latest installed Node version
-    local latest_node
     latest_node=$(command ls -1 "$NVM_DIR/versions/node" 2>/dev/null | sort -V | tail -1)
     if [[ -n "$latest_node" ]]; then
       nvm use "$latest_node" > /dev/null
@@ -103,6 +119,7 @@ zshexit() {
 ### === Load the ascii art. === ###
 [[ -o interactive ]] && source_if_exists "$HOME/.dotfiles/asciiart/asciiart.sh"
 
-### === Load Prompt 
+### === Load Prompt
 source_if_exists "$HOME/.dotfiles/zsh/prompt.zsh"
 
+export PATH="$HOME/.local/bin:$PATH"

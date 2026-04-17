@@ -8,6 +8,19 @@
 # License: MIT
 # https://github.com/simgeekiz/dotfiles
 
+# Load shared bootstrap helpers when install.sh is invoked directly or via sh -c.
+if [ -r "$HOME/.dotfiles/bootstrap/helpers.sh" ]; then
+  . "$HOME/.dotfiles/bootstrap/helpers.sh"
+else
+  printf '%s\n' "⚠️  helpers.sh not found or unreadable"
+fi
+
+if [ -r "$HOME/.dotfiles/bootstrap/linux-packages.sh" ]; then
+  . "$HOME/.dotfiles/bootstrap/linux-packages.sh"
+else
+  printf '%s\n' "⚠️  linux-packages.sh not found or unreadable"
+fi
+
 # Function to check if user can use sudo
 has_sudo() {
   # Check if sudo command exists
@@ -28,6 +41,89 @@ has_sudo() {
 
   # No sudo access at all
   return 1
+}
+
+has_apt() {
+  command -v apt >/dev/null 2>&1
+}
+
+detect_linux_package_manager() {
+  if command -v apt >/dev/null 2>&1; then
+    printf '%s\n' "apt"
+  elif command -v dnf >/dev/null 2>&1; then
+    printf '%s\n' "dnf"
+  elif command -v yum >/dev/null 2>&1; then
+    printf '%s\n' "yum"
+  elif command -v pacman >/dev/null 2>&1; then
+    printf '%s\n' "pacman"
+  elif command -v zypper >/dev/null 2>&1; then
+    printf '%s\n' "zypper"
+  else
+    return 1
+  fi
+}
+
+update_linux_packages() {
+  manager=$1
+
+  case "$manager" in
+    apt)
+      sudo apt update || printf '%s\n' "❗ Failed to update package lists."
+      sudo apt upgrade -y || printf '%s\n' "❗ Failed to upgrade packages."
+      ;;
+    dnf)
+      sudo dnf upgrade -y || printf '%s\n' "❗ Failed to upgrade packages."
+      ;;
+    yum)
+      sudo yum update -y || printf '%s\n' "❗ Failed to update packages."
+      ;;
+    pacman)
+      sudo pacman -Syu --noconfirm || printf '%s\n' "❗ Failed to synchronize packages."
+      ;;
+    zypper)
+      sudo zypper refresh || printf '%s\n' "❗ Failed to refresh package lists."
+      sudo zypper update -y || printf '%s\n' "❗ Failed to update packages."
+      ;;
+  esac
+}
+
+install_linux_package() {
+  manager=$1
+  pkg=$2
+
+  case "$manager" in
+    apt) sudo apt install -y "$pkg" ;;
+    dnf) sudo dnf install -y "$pkg" ;;
+    yum) sudo yum install -y "$pkg" ;;
+    pacman) sudo pacman -S --noconfirm --needed "$pkg" ;;
+    zypper) sudo zypper install -y "$pkg" ;;
+    *) return 1 ;;
+  esac
+}
+
+cleanup_linux_packages() {
+  manager=$1
+
+  case "$manager" in
+    apt)
+      sudo apt autoremove -y || printf '%s\n' "❗ Failed to autoremove packages during cleanup"
+      sudo apt clean || printf '%s\n' "❗ Failed to clean apt cache"
+      ;;
+    dnf)
+      sudo dnf autoremove -y || printf '%s\n' "❗ Failed to autoremove packages during cleanup"
+      sudo dnf clean all || printf '%s\n' "❗ Failed to clean dnf cache"
+      ;;
+    yum)
+      sudo yum autoremove -y || printf '%s\n' "❗ Failed to autoremove packages during cleanup"
+      sudo yum clean all || printf '%s\n' "❗ Failed to clean yum cache"
+      ;;
+    pacman)
+      sudo pacman -Sc --noconfirm || printf '%s\n' "❗ Failed to clean pacman cache"
+      ;;
+    zypper)
+      sudo zypper clean --all || printf '%s\n' "❗ Failed to clean zypper cache"
+      ;;
+  esac
 }
 
 # function to install fonts
@@ -128,6 +224,11 @@ install_p10k() {
 install_deb() {
   app="$1"
   url="$2"
+
+  if ! has_apt; then
+    printf '%s\n' "⚠️ .deb installs are only supported on apt-based Linux systems."
+    return 1
+  fi
   
   # Check for sudo first
   if ! has_sudo; then
@@ -159,6 +260,11 @@ install_deb() {
 
 
 install_code() {
+  if ! has_apt; then
+    printf '%s\n' "⚠️ VS Code repo setup is currently only supported on apt-based Linux systems."
+    return 1
+  fi
+
   # Check for sudo first
   if ! has_sudo; then
     printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
@@ -260,7 +366,12 @@ install_gui() {
   fi
 
   # List of GUI apps in "name|method|url" format
-  gui_file=$HOME/.dotfiles/gui-apps.txt
+  if ! has_apt; then
+    printf '%s\n' "⚠️ GUI app installation is currently only supported on apt-based Linux systems."
+    return 1
+  fi
+
+  gui_file=$HOME/.dotfiles/bootstrap/gui-apps.txt
 
 
   if [ ! -f "$gui_file" ]; then
@@ -395,31 +506,32 @@ install_cli() {
     return 1
   fi
 
-  printf '%s\n' "🔄 Updating system packages..."
-  sudo apt update || printf '%s\n' "❗ Failed to update package lists."
-  sudo apt upgrade -y || printf '%s\n' "❗ Failed to upgrade packages."
+  manager=$(detect_linux_package_manager) || {
+    printf '%s\n' "⚠️ No supported Linux package manager found."
+    return 1
+  }
 
-  printf '%s\n' "🔨 Installing CLI tools from apt.txt..."
-  
-  # --- Check if package list exists ---
-  file="$HOME/.dotfiles/bootstrap/apt.txt"
-  if [ -f "$file" ]; then
-    while IFS= read -r pkg; do
-      case $pkg in
-        ''|\#*) continue ;;
-      esac
-      
-      if ! sudo apt install -y "$pkg"; then
-        printf '%s\n' "❗ Failed to install $pkg; continuing..."
-      fi
-    done < "$file"
-  else
-    printf '%s\n' "ℹ️ No apt.txt found — skipping."
+  if ! type print_linux_package_list >/dev/null 2>&1; then
+    printf '%s\n' "⚠️ Linux package definitions are unavailable."
+    return 1
   fi
 
+  printf '%s\n' "🔄 Updating system packages with $manager..."
+  update_linux_packages "$manager"
+
+  printf '%s\n' "🔨 Installing CLI tools for $manager..."
+  print_linux_package_list "$manager" | while IFS= read -r pkg; do
+    case $pkg in
+      ''|\#*) continue ;;
+    esac
+
+    if ! install_linux_package "$manager" "$pkg"; then
+      printf '%s\n' "❗ Failed to install $pkg with $manager; continuing..."
+    fi
+  done
+
   printf '%s\n' "⚙️ Running cleanup steps..."
-  sudo apt autoremove -y || printf '%s\n' "❗ Failed to autoremove packages during cleanup"
-  sudo apt clean || printf '%s\n' "❗ Failed to clean apt cache"
+  cleanup_linux_packages "$manager"
 }
 
 

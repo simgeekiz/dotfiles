@@ -40,10 +40,15 @@
     "plaintext": false,
     "markdown": false,
     "scminput": false,
-    "jinja-html": false,
     "python": true,
+    "jinja-html": false,
+    "html": false,
   },
   "editor.formatOnSave": true,
+  "files.trimTrailingWhitespace": true,
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false,
+  },
   "[astro]": {
     "editor.defaultFormatter": "astro-build.astro-vscode",
   },
@@ -80,4 +85,6 @@
   "github.copilot.nextEditSuggestions.enabled": false,
   "editor.fontSize": 12,
   "claudeCode.preferredLocation": "panel",
+  "github.copilot.nextEditSuggestions.eagerness": "medium",
+  "chat.viewSessions.orientation": "stacked",
 }

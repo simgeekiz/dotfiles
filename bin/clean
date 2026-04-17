@@ -29,6 +29,12 @@ EOF
 
 # === Parse arguments ===
 parse_args() {
+  if [[ "$#" -eq 0 ]]; then
+    clean_trash
+    clean_package_cache
+    return
+  fi
+
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
       --help | -h | -help)
@@ -46,7 +52,7 @@ parse_args() {
         clean_package_cache
         ;;
       *)
-        printf "❗ Unknown option: $1"
+        printf "❗ Unknown option: $1\n"
         usage
         exit 1
         ;;

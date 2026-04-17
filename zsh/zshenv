@@ -4,8 +4,11 @@
 # Author: Simge Ekiz
 # License: MIT
 
-# environment variables
+# === Environment variables ===
 export LANG="en_US.UTF-8"
 export EDITOR="nano"
 export PAGER="less"
 export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# === NVM (Node Version Manager) ===
+export NVM_DIR="$HOME/.nvm"

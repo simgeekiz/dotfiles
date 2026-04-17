@@ -25,16 +25,23 @@ main() {
   # Check if the script exists and is executable
   pafile="$HOME/.dotfiles/privates/pa-info"
   hash_file="$HOME/.dotfiles/privates/pa-info.sha256"
-  expected_hash=$(awk '{print $1}' "$hash_file")
 
-  if [[ -e $pafile ]]; then
+  if [[ -e "$pafile" ]]; then
     run_pafile
     return
-  
+  fi
+
+  if [[ ! -f "$hash_file" ]]; then
+    echo "❗ Hash file not found: $hash_file"
+    return 1
+  fi
+
+  expected_hash=$(awk '{print $1}' "$hash_file")
+
   command -v curl >/dev/null 2>&1 || { echo "❗ curl not found"; return 1; }
   command -v bash >/dev/null 2>&1 || { echo "❗ bash not found"; return 1; }
 
-  echo "Warning: executing remote script\n" 
+  printf 'Warning: executing remote script\n\n'
 
   curl -fsSL "https://gitlab.freedesktop.org/pulseaudio/pulseaudio/raw/master/src/utils/pa-info?inline=false" -o "$pafile"
   chmod +x "$pafile"

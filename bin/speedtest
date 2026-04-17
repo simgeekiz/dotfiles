@@ -64,6 +64,18 @@ install_speedtest() {
         echo "[Info] Installing speedtest-cli via apt..."
         sudo apt update
         sudo apt install -y speedtest-cli
+      elif command -v dnf >/dev/null 2>&1; then
+        echo "[Info] Installing speedtest-cli via dnf..."
+        sudo dnf install -y speedtest-cli
+      elif command -v yum >/dev/null 2>&1; then
+        echo "[Info] Installing speedtest-cli via yum..."
+        sudo yum install -y speedtest-cli
+      elif command -v pacman >/dev/null 2>&1; then
+        echo "[Info] Installing speedtest-cli via pacman..."
+        sudo pacman -S --noconfirm --needed speedtest-cli
+      elif command -v zypper >/dev/null 2>&1; then
+        echo "[Info] Installing speedtest-cli via zypper..."
+        sudo zypper install -y speedtest-cli
       else
         echo "❗ Unsupported Linux package manager"
         exit 1

@@ -19,62 +19,52 @@ main() {
       printf '%s\n' "⚠️  Required function not found: $func"
   done
 
-  # === Git configurations === 
+  # === Git configurations ===
   if [ -r "$HOME/.dotfiles/git/gitconfig" ]; then
     symlink "$HOME/.dotfiles/git/gitconfig" "$HOME/.gitconfig"
   else
     printf '%s\n' "⚠️  Git config missing."
   fi
 
-  # === Guake settings === 
+  # === Guake settings ===
   # if command -v guake >/dev/null 2>&1; then
   # mkdir -p "$HOME/.config/guake/guake.conf"
   # symlink $HOME/.dotfiles/guake/guake.conf $HOME/.config/guake/guake.conf
 
-  # ===  List of config files to check ===
-  # Detect shell (more robust)
-  CURRENT_SHELL=${SHELL##*/}
-  CURRENT_SHELL=${CURRENT_SHELL:-sh}
-  printf '%s\n' "🐚 Detected shell: $CURRENT_SHELL"
+  link_shell_files() {
+    dir=$1
+    shift
 
-  set --  # reset args
-
-  case "$CURRENT_SHELL" in
-    zsh)
-      set -- zshrc zshenv
-      DIR="zsh"
-      ;;
-    bash)
-      set -- bashrc profile inputrc bash_logout
-      DIR="bash"
-      ;;
-    *)
-      printf '%s\n' "Unsupported shell: $CURRENT_SHELL"
-      exit 1
-      ;;
-  esac
-
-  # === Symlink shell files ===#
-  if [ "$#" -gt 0 ]; then
     for file in "$@"; do
-      if [ -r "$HOME/.dotfiles/$DIR/$file" ]; then
+      if [ -r "$HOME/.dotfiles/$dir/$file" ]; then
         backup_file "$HOME/.$file"
-        symlink "$HOME/.dotfiles/$DIR/$file" "$HOME/.$file"
+        symlink "$HOME/.dotfiles/$dir/$file" "$HOME/.$file"
       else
-        printf '%s\n' "⚠️  Source file missing"
+        printf '%s\n' "⚠️  Source file missing: $HOME/.dotfiles/$dir/$file"
       fi
     done
+  }
+
+  # Link whichever supported shells are available on this machine.
+  if command -v bash >/dev/null 2>&1; then
+    printf '%s\n' "🐚 Linking Bash configuration files"
+    link_shell_files "bash" bashrc profile inputrc bash_logout
+  fi
+
+  if command -v zsh >/dev/null 2>&1; then
+    printf '%s\n' "🐚 Linking Zsh configuration files"
+    link_shell_files "zsh" zshrc zshenv
   fi
 
 
-  # === POWERLEVEL10K === 
+  # === POWERLEVEL10K ===
   ### repo_dir="$HOME/powerlevel10k"
   ### if [ -d "$repo_dir/.git" ] && [ -d "$repo_dir" ]; then
   ### # printf '%s\n' "🗞️  Powerlevel10k already cloned at $repo_dir"
   ###  symlink $HOME/.dotfiles/p10k/.p10k.zsh $HOME/.p10k.zsh
   ### fi
 
-  # === VSCODE === 
+  # === VSCODE ===
   # bootstrap VS Code on macOS, Linux, WSL, or VS Code Server
   #   • Symlinks settings.json and keybindings.json from ~/.dotfiles/vscode
   #   • Installs extensions from ~/.dotfiles/vscode/extensions.txt
@@ -116,8 +106,8 @@ main() {
   fi
 }
 
-main "$@" 
+main "$@"
 
-# === # Autostart === 
+# === # Autostart ===
 # rm -rf $HOME/.config/autostart/
 # ln -sfn $HOME/.dotfiles/autostart/ $HOME/.config/autostart

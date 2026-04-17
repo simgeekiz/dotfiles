@@ -1,10 +1,10 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 #
 # This script is a replacement for the standard `rm` command.
 # It prompts the user for confirmation before deleting files or directories.
 # It is designed to be used as a safer alternative to the `rm` command.
 # Options:
-#   -f, --force    Ignore nonexistent files and never prompt    
+#   -f, --force    Ignore nonexistent files and never prompt
 #   -i, --interactive  Prompt before every removal
 #   -r, --recursive  Remove directories and their contents recursively
 #
@@ -12,6 +12,8 @@
 #
 # Author: Simge Ekiz
 # License: MIT
+
+set -euo pipefail
 
 script_name="${0##*/}"
 
@@ -48,7 +50,7 @@ VERBOSE=false
 # === Parse arguments ===
 parse_args() {
   if [[ $# -eq 0 ]]; then
-    echo -e "\e[31m[Error]\e[0m No arguments provided."
+    printf '\033[31m[Error]\033[0m No arguments provided.\n'
     usage
     exit 1
   fi
@@ -78,7 +80,7 @@ parse_args() {
 
   # If no valid files, exit
   if [[ ${#files[@]} -eq 0 ]]; then
-    echo -e "\e[31m[Error]\e[0m No valid files or directories."
+    printf '\033[31m[Error]\033[0m No valid files or directories.\n'
     exit 1
   fi
 }
@@ -90,7 +92,7 @@ confirm() {
   fi
 
   if [ $has_dir -eq 1 ]; then
-    echo -e "\e[31m[Warning]\e[0m You are about to delete a directory!"
+    printf '\033[31m[Warning]\033[0m You are about to delete a directory!\n'
   fi
 
 
@@ -112,13 +114,13 @@ confirm() {
 # === Execute deletion ===
 run_rm() {
   if [[ "$DRY_RUN" == true ]]; then
-    echo -e "\e[34m[Dry Run]\e[0m Would delete:"
+    printf '\033[34m[Dry Run]\033[0m Would delete:\n'
     printf '  "%s"\n' "${files[@]}"
     return
   fi
 
   if [[ "$VERBOSE" == true ]]; then
-    echo -e "\e[32m[Verbose]\e[0m Deleting:"
+    printf '\033[32m[Verbose]\033[0m Deleting:\n'
     printf '  "%s"\n' "${files[@]}"
   fi
 
@@ -132,7 +134,7 @@ main() {
   if confirm; then
     run_rm
   else
-    echo -e "\e[33mAborted.\e[0m"
+    printf '\033[33mAborted.\033[0m\n'
   fi
 }
 

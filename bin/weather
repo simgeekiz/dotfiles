@@ -44,6 +44,30 @@ EOF
 location=""
 extra_args=()
 
+urlencode() {
+  local input="$1"
+  local output=""
+  local i char
+
+  for ((i = 0; i < ${#input}; i++)); do
+    char="${input:i:1}"
+    case "$char" in
+      [a-zA-Z0-9.~_-])
+        output+="$char"
+        ;;
+      ' ')
+        output+='+'
+        ;;
+      *)
+        printf -v char_hex '%%%02X' "'$char"
+        output+="$char_hex"
+        ;;
+    esac
+  done
+
+  printf '%s\n' "$output"
+}
+
 # === Parse arguments ===
 parse_args() {
   while [[ $# -gt 0 ]]; do
@@ -73,7 +97,7 @@ fetch_weather() {
   if [[ -z "$location" ]]; then
     raw=$(curl -s "wttr.in?format=%l|%c|%C|%t|%w|%m")
   else
-    raw=$(curl -s "wttr.in/${location// /+}?format=%l|%c|%C|%t|%w|%m")
+    raw=$(curl -s "wttr.in/$(urlencode "$location")?format=%l|%c|%C|%t|%w|%m")
   fi
 
   if [[ -z "$raw" ]]; then

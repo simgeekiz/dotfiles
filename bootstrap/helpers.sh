@@ -67,12 +67,12 @@ prompt_user() {
 
     case "$user_input" in
       y|Y|yes|YES|Yes)
-        sh -c "$yes_cmd"
+        eval "$yes_cmd"
         break
         ;;
       n|N|no|NO|No)
         printf '%s\n' "⏭️  Skipping..."
-        [ -n "$no_cmd" ] && sh -c "$no_cmd"
+        [ -n "$no_cmd" ] && eval "$no_cmd"
         break
         ;;
       *)

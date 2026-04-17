@@ -62,21 +62,29 @@ else
 fi
 
 # ----- Build final PS1  -----
+build_prompt() {
+    PS1=""
+    PS1+="${debian_chroot:+($debian_chroot) }"  # chroot if any
+    PS1+="$BASE_PS1"                            # user@host + folder
+    PS1+="$(git_branch)"                        # optional git branch
+    PS1+="$(python_env)"                        # optional virtualenv
+    PS1+="${RESET}$ "                           # prompt character
 
-PS1=""
-PS1+="${debian_chroot:+($debian_chroot) }"  # chroot if any
-PS1+="$BASE_PS1"                            # user@host + folder
-PS1+="$(git_branch)"                        # optional git branch
-PS1+="$(python_env)"                       # optional virtualenv
-PS1+="${RESET}$ "                          # prompt character
+    # ----- Terminal title for xterm/rxvt -----
+    case "$TERM" in
+        xterm*|rxvt*)
+            PS1="\[\033]0;Bash\a\]$PS1"
+            ;;
+    esac
+}
 
+if [ -n "${PROMPT_COMMAND:-}" ]; then
+    PROMPT_COMMAND="build_prompt; $PROMPT_COMMAND"
+else
+    PROMPT_COMMAND="build_prompt"
+fi
+
+build_prompt
 export PS1
-
-# ----- Terminal title for xterm/rxvt -----
-case "$TERM" in
-    xterm*|rxvt*)
-        PS1="\[\033]0;Bash\a\]$PS1"
-        ;;
-esac
 
 unset color_prompt force_color_prompt

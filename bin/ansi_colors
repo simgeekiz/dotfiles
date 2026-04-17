@@ -15,6 +15,9 @@
 set -euo pipefail
 
 script_name="${0##*/}"
+PRINT_STANDARD=false
+PRINT_ALL=false
+PRINT_CUBE=false
 
 usage() {
   cat <<EOF
@@ -97,7 +100,7 @@ print_all_colors() {
 
 # 🎨 Function: 6x6x6 color cube
 print_color_cube() {
-  echo 
+  echo
   echo
   echo "ANSI 256-color cube:"
 
@@ -117,7 +120,7 @@ print_color_cube() {
 # 🚀 Main
 main() {
   parse_args "$@"
-  
+
   # Execute functions only if their flag is true
   $PRINT_STANDARD && print_standard_colors_with_codes
   $PRINT_ALL && print_all_colors

@@ -16,7 +16,7 @@ alias pip='pip3'
 alias please='sudo'
 
 # VSCODE
-has code && alias editdotfiles="code \"$HOME/.dotfiles\""
+has code && alias editdotfiles="code \"\$HOME/.dotfiles\""
 
 # nvidia-prime Control
 has prime-select && alias nvidia='sudo prime-select nvidia'
@@ -53,15 +53,13 @@ alias jlab='jupyter lab'
 alias md='mkdir -p'
 alias rd=rmdir
 
-# Folder Navigation;
+# Folder Navigation
 alias ..='cd ..'
 alias cd..='cd ..'
-alias cddot='cd $HOME/.dotfiles'
-alias cdwork='cd $HOME/workspaces/'
+alias cddot='cd "$HOME/.dotfiles"'
+alias cdwork='cd "$HOME/workspaces/"'
 
-# Navigations
-alias cd..='cd ..'
-alias ..='cd ..'
+# Multi-level directory navigation
 alias ...='cd ../..'
 alias .3='cd ../../..'
 alias .4='cd ../../../..'
@@ -74,8 +72,8 @@ fi
 # ls and ls color
 case "$(uname -s)" in
   Darwin*) alias ls='ls -G' ;;
-  Linux*)  
-  
+  Linux*)
+
       # Optional: only if dircolors exists
     if command -v dircolors >/dev/null 2>&1; then
       eval "$(dircolors -b ~/.dircolors 2>/dev/null || dircolors -b)"
@@ -102,14 +100,14 @@ alias fdir='find . -type d -name'
 alias ff='find . -type f -name'
 
 # df(short for disk free) is used to show the amount of free disk space available
-# Show human friendly numbers and colors 
+# Show human friendly numbers and colors
 alias df='df -h'
 
-case "$(uname -s)" in
-  Darwin*) alias du='du -h -L 2' ;;  # BSD alternative
-  Linux*) 
-  alias du='du -h -d 2';;
-esac
+if du -d 0 . >/dev/null 2>&1; then
+  alias du='du -h -d 2'
+else
+  alias du='du -h'
+fi
 
 # Kill jobs
 alias ka9='killall -9'

@@ -59,8 +59,20 @@ find_existing_ssh_key() {
 # === 🧠 Generate SSH key ===
 generate_key() {
   echo "🔐 No SSH key found. Generating a new one..."
-  read -r "📧 Enter your email for the SSH key: " EMAIL
+  printf '%s' "📧 Enter your email for the SSH key: "
+  read -r EMAIL
 
+  if [[ -z "$EMAIL" ]]; then
+    echo "❗ Email is required."
+    return 1
+  fi
+
+  if ! command -v ssh-keygen >/dev/null 2>&1; then
+    echo "❗ ssh-keygen not found"
+    return 1
+  fi
+
+  mkdir -p "$SSHDIR"
   ssh-keygen -t ed25519 -C "$EMAIL"
 
   # Ensure ssh-add exists

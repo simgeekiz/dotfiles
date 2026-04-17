@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Pull from repository and check symlinks and the installation
-# Usage: dotfiles 
+# Usage: dotfiles
 #
 # Author: Simge Ekiz
 # License: MIT
@@ -83,11 +83,11 @@ main () {
     printf '%s\n' "⚠️  symlink.sh not found or unreadable."
   fi
 
-  cd $HOME
+  cd "$HOME"
 
   # === Restarting terminal ===
   if command -v "${SHELL:-/bin/sh}" >/dev/null 2>&1; then
-    printf '%s\n' "🦆 Restarting Terminal"  
+    printf '%s\n' "🦆 Restarting Terminal"
     exec "${SHELL:-/bin/sh}" -l || printf '%s\n' "Could not restart shell. Please restart manually."
   fi
 
