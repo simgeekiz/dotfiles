@@ -36,9 +36,15 @@ git_branch() {
 
 # ----- Python virtualenv function -----
 python_env() {
+    local env_name=""
+
     if [[ -n "$VIRTUAL_ENV" ]]; then
-        local env_name
         env_name=$(basename "$VIRTUAL_ENV")
+    elif [[ -n "$CONDA_DEFAULT_ENV" ]]; then
+        env_name="$CONDA_DEFAULT_ENV"
+    fi
+
+    if [[ -n "$env_name" ]]; then
         echo "(${CYAN}${env_name}${RESET}) "
     fi
 }
@@ -78,13 +84,10 @@ build_prompt() {
     esac
 }
 
-if [ -n "${PROMPT_COMMAND:-}" ]; then
-    PROMPT_COMMAND="build_prompt; $PROMPT_COMMAND"
-else
-    PROMPT_COMMAND="build_prompt"
-fi
+prompt_command() {
+    build_prompt
+}
 
-build_prompt
-export PS1
+PROMPT_COMMAND=prompt_command
 
 unset color_prompt force_color_prompt
