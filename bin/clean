@@ -93,21 +93,6 @@ clean_package_cache() {
     sudo apt clean
     sudo apt autoclean
     sudo apt autoremove -y
-  elif command -v dnf >/dev/null 2>&1; then
-    printf "${MAGENTA}🧼 Cleaning DNF...${RESET}"
-    sudo dnf autoremove -y
-    sudo dnf clean all
-  elif command -v yum >/dev/null 2>&1; then
-    printf "${MAGENTA}🧼 Cleaning YUM...${RESET}"
-    sudo yum autoremove -y
-    sudo yum clean all
-  elif command -v pacman >/dev/null 2>&1; then
-    printf "${MAGENTA}🧼 Cleaning Pacman...${RESET}"
-    sudo pacman -Rns $(pacman -Qtdq) || true
-    sudo pacman -Sc --noconfirm
-  elif command -v zypper >/dev/null 2>&1; then
-    printf "${MAGENTA}🧼 Cleaning Zypper...${RESET}"
-    sudo zypper clean --all
   elif command -v brew >/dev/null 2>&1; then
     printf "${MAGENTA}🍺 Cleaning Homebrew...${RESET}"
     brew cleanup -s

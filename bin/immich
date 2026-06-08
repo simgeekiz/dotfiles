@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+#
+# Description: Manage the Immich docker-compose app in ~/.immich-app
+# Usage: immich [action] / immich
+# Actions: up | down | restart | status | logs
+# Credit: https://github.com/ErkanBasar/dotfiles/blob/main/scripts/immich.sh
+#
+# Author: Simge Ekiz
+# License: MIT
+
+set -euo pipefail
+
+script_name="${0##*/}"
+COMPOSE_DIR="${IMMICH_COMPOSE_DIR:-$HOME/.immich-app}"
+ACTION="up"
+
+usage() {
+    cat <<EOF
+Usage: $script_name [action]
+
+Actions:
+    up       Start services (default)
+    down     Stop services
+    restart  Restart services
+    status   Show container status
+    logs     Follow logs
+    -h, --help  Show this help message
+EOF
+}
+
+parse_args() {
+    if [[ "$#" -gt 0 ]]; then
+        case "$1" in
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            up|down|restart|status|logs)
+                ACTION="$1"
+                ;;
+            *)
+                echo "❗ Unknown action: $1"
+                usage
+                exit 1
+                ;;
+        esac
+    fi
+}
+
+check_requirements() {
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "❗ docker is not installed or not in PATH"
+        exit 1
+    fi
+    # Prefer `docker compose`, fallback to `docker-compose` if needed
+    if docker compose version >/dev/null 2>&1; then
+        COMPOSE_CMD=(docker compose)
+    elif command -v docker-compose >/dev/null 2>&1; then
+        COMPOSE_CMD=(docker-compose)
+    else
+        echo "❗ docker compose plugin or docker-compose not found"
+        exit 1
+    fi
+}
+
+main() {
+    parse_args "$@"
+    check_requirements
+
+    if [[ ! -d "$COMPOSE_DIR" ]]; then
+        echo "❗ Compose directory not found: $COMPOSE_DIR"
+        exit 1
+    fi
+
+    cd "$COMPOSE_DIR" || { echo "❗ Failed to enter $COMPOSE_DIR"; exit 1; }
+
+    case "$ACTION" in
+        up)
+            sudo "${COMPOSE_CMD[@]}" up -d
+            ;;
+        down)
+            sudo "${COMPOSE_CMD[@]}" down
+            ;;
+        restart)
+            sudo "${COMPOSE_CMD[@]}" down
+            sudo "${COMPOSE_CMD[@]}" up -d
+            ;;
+        status)
+            sudo "${COMPOSE_CMD[@]}" ps
+            ;;
+        logs)
+            sudo "${COMPOSE_CMD[@]}" logs -f
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

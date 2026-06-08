@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # ~/.dotfiles/ssh/upload_ssh_to_github.sh
 # Uploads the local SSH public key to GitHub.
-# - Prints public SSH key, generates SSH key if necessary 
+# - Prints public SSH key, generates SSH key if necessary
 # - Adds SSH key to the ssh-agent and uploads it to the github.
 # Author: Simge Ekiz
 # License: MIT
@@ -33,14 +33,6 @@ install_package() {
   pkg=$1
   if command -v apt >/dev/null 2>&1; then
     sudo apt install -y "$pkg" || printf '%s\n' "Failed to install $pkg (apt)"
-  elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y "$pkg" || printf '%s\n' "Failed to install $pkg (dnf)"
-  elif command -v yum >/dev/null 2>&1; then
-    sudo yum install -y "$pkg" || printf '%s\n' "Failed to install $pkg (yum)"
-  elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm "$pkg" || printf '%s\n' "Failed to install $pkg (pacman)"
-  # elif command -v zypper >/dev/null 2>&1; then
-  #   sudo zypper install -y "$pkg" || printf '%s\n' "Failed to install $pkg (zypper)"
   else
     printf '%s\n' "❗ Unsupported OS: $(uname -s)" >&2
     exit 1
@@ -67,13 +59,13 @@ check_GitHub_CLI() {
       command -v gh >/dev/null 2>&1 || {
         echo "🌸 Installing GitHub CLI"
         brew install gh
-      } 
+      }
       ;;
     Linux)
       # Install GitHub CLI (if missing)
       if ! command -v gh >/dev/null 2>&1; then
         if has_sudo; then
-          install_package gh 
+          install_package gh
         else
           echo "⚠️ No sudo access. Skipping GitHub CLI installation."
           echo "ℹ️ You can still use git + SSH without gh."
@@ -89,18 +81,18 @@ check_GitHub_CLI() {
 
 main() {
   # If no key exists, generate a new one
-  if ! print_existing_ssh_key; then # Check for existing SSH keys. 
+  if ! print_existing_ssh_key; then # Check for existing SSH keys.
     echo "🔐 No SSH key found. Generating a new one..."
     printf "📧 Enter your email for the SSH key: "
     read EMAIL
 
     # Generating a new SSH key
-    ssh-keygen -t ed25519 -C "$EMAIL" 
+    ssh-keygen -t ed25519 -C "$EMAIL"
 
     # Adding your SSH key to the ssh-agent
     eval "$(ssh-agent -s)" # Start the ssh-agent
     ssh-add "$SSHDIR/id_ed25519"
-  
+
     echo "✅ SSH key generated and added to the ssh-agent."
   fi
 
@@ -135,7 +127,7 @@ main() {
       echo "⚠️  SSH key is already in use on GitHub. Skipping upload."
     else
       echo "🔑 SSH key uploaded to GitHub with title: $KEY_TITLE"
-    fi  
+    fi
   else
     echo "ℹ️ gh not found, falling back to manual setup."
     echo "👉 Copy this key and add it to GitHub:"

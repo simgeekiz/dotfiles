@@ -4,6 +4,7 @@
 # Author: Simge Ekiz
 # License: MIT
 
+# === Interactive check ===
 # If not running interactively, don't do anything
 case $- in
   *i*) ;;
@@ -14,8 +15,42 @@ source_if_exists() {
   [ -r "$1" ] && . "$1"
 }
 
-# === PATH and environment variables ===
-source_if_exists "$HOME/.dotfiles/bash/env.sh"
+# === Shell behavior (history, options) ===
+# History settings
+HISTCONTROL=ignoreboth       # ignore duplicates & lines starting with space
+shopt -s histappend          # append to history, don't overwrite
+HISTSIZE=1000                # for setting history length see HISTSIZE
+HISTFILESIZE=2000            # and HISTFILESIZE in bash(1)
+
+# Shell options
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+# shopt -s globstar
+
+# -- lesspipe initialization, make less more friendly for non-text input files
+if command -v lesspipe >/dev/null 2>&1; then
+  eval "$(SHELL=/bin/sh lesspipe)"
+fi
+
+# === Prompt / PS1 ===
+source_if_exists "$HOME/.dotfiles/bash/prompt.sh"
+
+# === Functions ===
+for file in "$HOME/.dotfiles/functions"/*.sh; do
+  [ -r "$file" ] && . "$file"
+done
+
+# === Aliases ===
+source_if_exists "$HOME/.dotfiles/bash/bash_aliases.sh"
+source_if_exists "$HOME/.dotfiles/tmux/tmux_aliases.sh"
+source_if_exists "$HOME/.dotfiles/git/git_aliases.sh"
+
+# === Completion ===
+source_if_exists "$HOME/.dotfiles/bash/completion.sh"
 
 # === Tool initialization ===
 # -- nvm lazy-loading
@@ -50,7 +85,7 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
   }
 fi
 
-# -- conda initialization ===
+# -- conda initialization
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('$HOME/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
@@ -63,36 +98,3 @@ else
     fi
 fi
 unset __conda_setup
-
-# -- lesspipe initialization
-if command -v lesspipe >/dev/null 2>&1; then
-  eval "$(SHELL=/bin/sh lesspipe)"
-fi
-
-# === Shell behavior (history, options) ===
-# History settings
-HISTCONTROL=ignoreboth       # ignore duplicates & lines starting with space
-shopt -s histappend          # append to history, don't overwrite
-HISTSIZE=1000                # for setting history length see HISTSIZE
-HISTFILESIZE=2000            # and HISTFILESIZE in bash(1)
-
-# Shell options
-shopt -s checkwinsize        # update LINES and COLUMNS after resize
-# shopt -s globstar           # enable '**' in pathname expansion (optional)
-
-# === Functions ===
-for file in "$HOME/.dotfiles/functions"/*.sh; do
-  [ -r "$file" ] && . "$file"
-done
-
-# === Aliases ===
-# Load alias definitions.
-source_if_exists "$HOME/.dotfiles/bash/bash_aliases.sh"
-source_if_exists "$HOME/.dotfiles/tmux/tmux_aliases.sh"
-source_if_exists "$HOME/.dotfiles/git/git_aliases.sh"
-
-# === Prompt / PS1 ===
-source_if_exists "$HOME/.dotfiles/bash/prompt.sh"
-
-# === Completion ===
-source_if_exists "$HOME/.dotfiles/bash/completion.sh"

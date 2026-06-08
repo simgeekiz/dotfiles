@@ -9,7 +9,7 @@
 
 warn() { printf '⚠️  %s\n' "$*" >&2; }
 
-cd "$HOME" 
+cd "$HOME"
 
 # ---Globals---
 USE_ZSH=false
@@ -47,14 +47,6 @@ install_package() {
   pkg=$1
   if command -v apt >/dev/null 2>&1; then
     sudo apt install -y "$pkg" || printf '%s\n' "Failed to install $pkg (apt)"
-  elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y "$pkg" || printf '%s\n' "Failed to install $pkg (dnf)"
-  elif command -v yum >/dev/null 2>&1; then
-    sudo yum install -y "$pkg" || printf '%s\n' "Failed to install $pkg (yum)"
-  elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -S --noconfirm "$pkg" || printf '%s\n' "Failed to install $pkg (pacman)"
-  # elif command -v zypper >/dev/null 2>&1; then
-  #   sudo zypper install -y "$pkg" || printf '%s\n' "Failed to install $pkg (zypper)"
   else
     printf '%s\n' "❗ Unsupported OS: $(uname -s)" >&2
     exit 1
@@ -67,7 +59,7 @@ ask_for_zsh() {
     USE_ZSH=true
     return 0
   fi
-  
+
   printf '%s' "🐚 Do you want to switch your default shell to Zsh? [y/N]: "
   IFS= read -r answer
 
@@ -79,25 +71,25 @@ ask_for_zsh() {
 # --- macOS setup ---
 setup_macos() {
   printf '%s\n' "🍏 Platform detected as macOS."
-  # Prompt user 
+  # Prompt user
   printf "🛠️  Do you want to do the installation and update? (y/N) "
   read answer
 
-  # Normalize to lowercase 
+  # Normalize to lowercase
   answer=$(printf "%s" "$answer" | tr '[:upper:]' '[:lower:]')
-  
+
   case "$answer" in
   y|yes)
-        
+
     # Install Homebrew if missing
-    if ! command -v brew >/dev/null 2>&1; then 
+    if ! command -v brew >/dev/null 2>&1; then
       printf '%s\n' "🫖 Installing Homebrew..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || warn "Homebrew install failed"
 
       # Set up brew environment for current shell session
       [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
-    
+
     # Install Git (if missing)
     command -v git >/dev/null 2>&1 || brew install git || warn "git install failed"
     # Install curl (if missing)
@@ -117,14 +109,14 @@ setup_macos() {
 # --- Linux setup ---
 setup_linux() {
   printf '%s\n' "🌲 Platform detected as Linux."
-  
+
   # Check for sudo first
   if ! has_sudo; then
     printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
     return 1
   fi
 
-  # Prompt user 
+  # Prompt user
   printf "🛠️  Do you want to do the installation and update? (y/N) "
   read answer
 
@@ -133,7 +125,7 @@ setup_linux() {
 
   case "$answer" in
     y|yes)
-        
+
       if [ -f /etc/debian_version ]; then
         sudo apt update || warn "apt update failed"
       fi

@@ -56,14 +56,6 @@ main() {
     link_shell_files "zsh" zshrc zshenv
   fi
 
-
-  # === POWERLEVEL10K ===
-  ### repo_dir="$HOME/powerlevel10k"
-  ### if [ -d "$repo_dir/.git" ] && [ -d "$repo_dir" ]; then
-  ### # printf '%s\n' "🗞️  Powerlevel10k already cloned at $repo_dir"
-  ###  symlink $HOME/.dotfiles/p10k/.p10k.zsh $HOME/.p10k.zsh
-  ### fi
-
   # === VSCODE ===
   # bootstrap VS Code on macOS, Linux, WSL, or VS Code Server
   #   • Symlinks settings.json and keybindings.json from ~/.dotfiles/vscode

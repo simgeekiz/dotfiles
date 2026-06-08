@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
 # Update script for Linux and MacOS
-# - updates the system packages;  
+# - updates the system packages;
 # - cleans up unnecessary packages;
 #
 # Author: Simge Ekiz
-# License: MIT 
+# License: MIT
 #
 
 set -euo pipefail
@@ -25,10 +25,10 @@ Options:
 
 Description:
   This script updates your system packages and cleans unnecessary packages.
-  Supports apt, dnf, yum, pacman, zypper, and Homebrew (macOS).
+  Supports apt and Homebrew (macOS).
 
 Examples:
-  $script_name 
+  $script_name
 EOF
 }
 
@@ -37,17 +37,6 @@ update_and_upgrade() {
   if command -v apt >/dev/null 2>&1; then
     sudo apt update
     sudo apt full-upgrade -y
-  elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf check-update -y
-    sudo dnf upgrade -y
-  elif command -v yum >/dev/null 2>&1; then
-    sudo yum check-update -y
-    sudo yum update -y
-  elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Syu --noconfirm
-  elif command -v zypper >/dev/null 2>&1; then
-    sudo zypper refresh
-    sudo zypper update -y
   elif command -v brew >/dev/null 2>&1; then
     # Make sure we’re using the latest Homebrew.
     brew update
@@ -82,7 +71,7 @@ main() {
       echo "Don't run this script as root"
       exit 1
   fi
-  
+
   parse_args "$@"
 
   update_and_upgrade

@@ -15,7 +15,6 @@
 - Brewfile
 - Configs for apps
 - Auto-completion
-- Powerlevel10k
 - Asciiart ^^
 
 ### **Prerequisites:**
@@ -23,14 +22,14 @@
 - Run the prerequisites script.
 
 ```
-  $ curl -o prerequisites.sh https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
-  $ sh prerequisites.sh
+  curl -o prerequisites.sh https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
+  sh prerequisites.sh
 ```
 
 - Restart your terminal
 
 ```
-$ exec /bin/zsh
+  exec /bin/zsh
 ```
 
 - Check zsh installed and it is your current shell.
@@ -44,7 +43,7 @@ $ command -v zsh >/dev/null 2>&1 && [ -n "$ZSH_VERSION" ] && echo "Zsh: $ZSH_VER
 - Run setup script:
 
 ```
-$ sh ./.dotfiles/bootstrap/setup.sh
+  sh ./.dotfiles/bootstrap/setup.sh
 ```
 
 ### **Resources**

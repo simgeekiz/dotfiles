@@ -18,28 +18,31 @@ What am I installing and what are the step?
 3. Install git
 
 ```
-  $ sudo apt update && sudo apt install -y git
+  sudo apt update && sudo apt install -y git
 ```
 
 4. Clone dotfiles repository.
 
 ```
-  $ git clone git@github.com:simgeekiz/dotfiles.git ~/.dotfiles
+  git clone git@github.com:simgeekiz/dotfiles.git ~/.dotfiles
+```
 
-  # If you don't want to use the SSH link (uses SSH key) Use HTTPS link.
-  $ git clone https://github.com/simgeekiz/dotfiles.git ~/.dotfiles
+If you don't want to use the SSH link (uses SSH key) Use HTTPS link.
+
+```
+  git clone https://github.com/simgeekiz/dotfiles.git ~/.dotfiles
 ```
 
 5. Restart your terminal
 
 ```
-$ exec /bin/zsh
+  exec /bin/zsh
 ```
 
 6. Check zsh installed and it is your current shell.
 
 ```
-$ command -v zsh >/dev/null 2>&1 && [ -n "$ZSH_VERSION" ] && echo "Zsh: $ZSH_VERSION " || echo "Zsh not installed or not current shell"
+  command -v zsh >/dev/null 2>&1 && [ -n "$ZSH_VERSION" ] && echo "Zsh: $ZSH_VERSION " || echo "Zsh not installed or not current shell"
 ```
 
 Or **Run the preparation script. (prerequisites.sh):**
@@ -47,8 +50,8 @@ Or **Run the preparation script. (prerequisites.sh):**
 This script does the steps above;
 
 ```
-  $ curl -o prerequisites.sh https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
-  $ sh prerequisites.sh
+  curl -o prerequisites.sh https://raw.githubusercontent.com/simgeekiz/dotfiles/refs/heads/master/bootstrap/prerequisites.sh
+  sh prerequisites.sh
 
 ```
 
@@ -59,7 +62,7 @@ This script does the steps above;
 - Run setup script:
 
 ```
-  $ sh ./.dotfiles/bootstrap/setup.sh
+  sh ./.dotfiles/bootstrap/setup.sh
 ```
 
 - Check if Zsh is installed
