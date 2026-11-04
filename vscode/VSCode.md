@@ -75,6 +75,7 @@ Or Cmd + K V (Mac)
 
 ```
 Ctrl + Shift + I
+In Mac Alt + Shift + I
 ```
 
 - To format Selection

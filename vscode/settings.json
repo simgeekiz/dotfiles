@@ -1,53 +1,53 @@
 {
-  "typescript.tsc.autoDetect": "off",
-  "eslint.alwaysShowStatus": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "true",
-  },
-  "eslint.validate": ["javascript"],
+  // ---- Workbench / Theme ----
+  "workbench.colorTheme": "Light 2026",
   "workbench.preferredDarkColorTheme": "Visual Studio Dark",
   "workbench.preferredHighContrastColorTheme": "Visual Studio Dark",
   "workbench.preferredHighContrastLightColorTheme": "Visual Studio Dark",
   "workbench.preferredLightColorTheme": "Visual Studio Dark",
-  "typescript.inlayHints.enumMemberValues.enabled": true,
-  "git.autofetch": true,
+
+  // ---- Editor: appearance ----
   "editor.fontFamily": "Menlo, Consolas, DejaVu Sans Mono, monospace",
-  "editor.minimap.autohide": "mouseover",
-  "html.format.indentInnerHtml": true,
-  "html.format.indentHandlebars": true,
-  "editor.multiCursorModifier": "ctrlCmd",
-  "editor.formatOnPaste": true,
+  "editor.fontSize": 12,
   "editor.renderLineHighlight": "none",
   "editor.renderWhitespace": "boundary",
-  "editor.suggest.showStatusBar": true,
-  "workbench.colorTheme": "Visual Studio Dark",
   "editor.minimap.enabled": false,
+  "editor.minimap.autohide": "mouseover",
+
+  // ---- Editor: behavior ----
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.wordWrap": "on",
+  "editor.tabSize": 2,
+  "editor.suggest.showStatusBar": true,
+  "editor.quickSuggestions": {
+    "other": "offWhenInlineCompletions",
+    "comments": "off",
+    "strings": "off",
+  },
+  "editor.inlineSuggest.enabled": true,
+
+  // ---- Editor: formatting ----
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "true",
+  },
+
+  // ---- Diff editor ----
+  "diffEditor.ignoreTrimWhitespace": false,
+
+  // ---- Language-specific overrides ----
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
-  "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 1000,
-  "editor.tabSize": 2,
-  "editor.cursorSmoothCaretAnimation": "on",
-  "editor.wordWrap": "on",
-  "diffEditor.ignoreTrimWhitespace": false,
-  "github.copilot.enable": {
-    "*": false,
-    "plaintext": false,
-    "markdown": false,
-    "scminput": false,
-    "python": true,
-    "jinja-html": false,
-    "html": false,
-  },
-  "editor.formatOnSave": true,
-  "files.trimTrailingWhitespace": true,
-  "[markdown]": {
-    "files.trimTrailingWhitespace": false,
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
   },
   "[astro]": {
     "editor.defaultFormatter": "astro-build.astro-vscode",
@@ -55,19 +55,35 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
   },
-  "python.formatting.provider": "black",
-  "python.formatting.blackArgs": ["--line-length", "88"],
-  "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
-  },
   "[jinja-html]": {
     "editor.defaultFormatter": "vscode.html-language-features",
     "editor.formatOnSave": true,
   },
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false,
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off",
+    },
+    "editor.inlineSuggest.enabled": false,
+    "editor.suggestOnTriggerCharacters": false,
+  },
+
+  // ---- Files ----
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.trimTrailingWhitespace": true,
   "files.associations": {
     "**/templates/**/*.html": "jinja-html",
   },
+  "files.exclude": {
+    "**/__init__.py": true,
+    "**/__pycache__": true,
+    "**/.ruff_cache": true,
+  },
+
+  // ---- Explorer ----
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.js",
     "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
@@ -82,9 +98,42 @@
     "*.sdb": "${capture}.${extname}-*",
     "*.s3db": "${capture}.${extname}-*",
   },
-  "github.copilot.nextEditSuggestions.enabled": false,
-  "editor.fontSize": 12,
-  "claudeCode.preferredLocation": "panel",
+
+  // ---- Git ----
+  "git.autofetch": true,
+
+  // ---- TypeScript ----
+  "typescript.tsc.autoDetect": "off",
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+
+  // ---- ESLint ----
+  "eslint.alwaysShowStatus": true,
+  "eslint.validate": ["javascript"],
+
+  // ---- HTML ----
+  "html.format.indentInnerHtml": true,
+  "html.format.indentHandlebars": true,
+
+  // ---- Python ----
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length", "88"],
+
+  // ---- GitHub Copilot / Chat ----
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "jinja-html": false,
+    "html": false,
+    "python": true,
+    "shellscript": true,
+  },
+  "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.nextEditSuggestions.eagerness": "medium",
   "chat.viewSessions.orientation": "stacked",
+  "chat.sessionSync.enabled": true,
+
+  // ---- Claude Code ----
+  "claudeCode.preferredLocation": "panel",
 }

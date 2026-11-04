@@ -35,7 +35,7 @@
 - Check zsh installed and it is your current shell.
 
 ```
-$ command -v zsh >/dev/null 2>&1 && [ -n "$ZSH_VERSION" ] && echo "Zsh: $ZSH_VERSION " || echo "Zsh not installed or not current shell"
+  command -v zsh >/dev/null 2>&1 && [ -n "$ZSH_VERSION" ] && echo "Zsh: $ZSH_VERSION " || echo "Zsh not installed or not current shell"
 ```
 
 ### **Installation**

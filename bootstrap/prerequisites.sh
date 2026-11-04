@@ -13,7 +13,8 @@ cd "$HOME"
 
 # ---Globals---
 USE_ZSH=false
-CURRENT_SHELL=${SHELL##*/}
+CURRENT_SHELL=$(ps -p $$ -o comm=)
+CURRENT_SHELL=${CURRENT_SHELL##*/}
 CURRENT_SHELL=${CURRENT_SHELL:-sh}
 
 has_sudo() {
@@ -235,4 +236,12 @@ main() {
   setup_zsh
 }
 
-main "$@"
+# Only skip main() when this file is sourced by a Bats test
+# (BATS_TEST_FILENAME is set automatically by the Bats test framework);
+# this lets tests load this script's functions without running the real
+# program. In every other context -- direct execution, or being sourced
+# on purpose by another bootstrap script (e.g. setup.sh sourcing this
+# file to reuse its main()) -- main() still runs exactly as before.
+if [ -z "${BATS_TEST_FILENAME:-}" ]; then
+  main "$@"
+fi

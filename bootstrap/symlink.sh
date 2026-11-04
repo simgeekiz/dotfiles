@@ -27,9 +27,12 @@ main() {
   fi
 
   # === Guake settings ===
-  # if command -v guake >/dev/null 2>&1; then
-  # mkdir -p "$HOME/.config/guake/guake.conf"
-  # symlink $HOME/.dotfiles/guake/guake.conf $HOME/.config/guake/guake.conf
+  if command -v guake >/dev/null 2>&1 &&
+    [ -r "$HOME/.dotfiles/guake/guake.conf" ]; then
+      guake --restore-preferences "$HOME/.dotfiles/guake/guake.conf"
+  else
+    printf '%s\n' "⚠️  Guake config missing."
+  fi
 
   link_shell_files() {
     dir=$1
@@ -98,7 +101,15 @@ main() {
   fi
 }
 
-main "$@"
+# Only skip main() when this file is sourced by a Bats test
+# (BATS_TEST_FILENAME is set automatically by the Bats test framework);
+# this lets tests load this script's functions without running the real
+# program. In every other context -- direct execution, or being sourced
+# on purpose by another bootstrap script (e.g. setup.sh sourcing this
+# file to reuse its main()) -- main() still runs exactly as before.
+if [ -z "${BATS_TEST_FILENAME:-}" ]; then
+  main "$@"
+fi
 
 # === # Autostart ===
 # rm -rf $HOME/.config/autostart/

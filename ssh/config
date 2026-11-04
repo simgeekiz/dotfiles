@@ -1,0 +1,10 @@
+# Work-specific hosts live in ~/.ssh/config.local (not tracked in this repo).
+
+Include ~/.ssh/config.local
+
+# Everything else (GitHub, GitLab.com, Bitbucket, etc.)
+
+Host *
+User git
+IdentityFile ~/.ssh/id_ed25519
+IdentitiesOnly yes

@@ -15,11 +15,19 @@ else
   printf '%s\n' "⚠️  helpers.sh not found or unreadable"
 fi
 
-if [ -r "$HOME/.dotfiles/bootstrap/linux-packages.sh" ]; then
-  . "$HOME/.dotfiles/bootstrap/linux-packages.sh"
-else
-  printf '%s\n' "⚠️  linux-packages.sh not found or unreadable"
-fi
+# Packages installed by install_cli on apt-based systems.
+COMMON_PACKAGES='
+ git
+ curl
+ tmux
+ wget
+ guake
+ python3
+ python3-pip
+ python3-venv
+ build-essential
+ gpg
+ '
 
 # Function to check if user can use sudo
 has_sudo() {
@@ -298,6 +306,7 @@ install_gui() {
 # Function to install CLI tools and update the system
 install_cli() {
   # Check for sudo first
+  printf '%s\n' "Cli install"
   if ! has_sudo; then
     printf '%s\n' "❗ This function requires sudo privileges. Skipping..."
     return 1
@@ -308,20 +317,11 @@ install_cli() {
     return 1
   }
 
-  if ! type print_linux_package_list >/dev/null 2>&1; then
-    printf '%s\n' "⚠️ Linux package definitions are unavailable."
-    return 1
-  fi
-
   printf '%s\n' "🔄 Updating system packages with $manager..."
   update_linux_packages "$manager"
 
   printf '%s\n' "🔨 Installing CLI tools for $manager..."
-  print_linux_package_list "$manager" | while IFS= read -r pkg; do
-    case $pkg in
-      ''|\#*) continue ;;
-    esac
-
+  for pkg in $COMMON_PACKAGES; do
     if ! install_linux_package "$manager" "$pkg"; then
       printf '%s\n' "❗ Failed to install $pkg with $manager; continuing..."
     fi
@@ -375,7 +375,15 @@ main() {
   esac
 }
 
-main "$@"
+# Only skip main() when this file is sourced by a Bats test
+# (BATS_TEST_FILENAME is set automatically by the Bats test framework);
+# this lets tests load this script's functions without running the real
+# program. In every other context -- direct execution, or being sourced
+# on purpose by another bootstrap script (e.g. setup.sh sourcing this
+# file to reuse its main()) -- main() still runs exactly as before.
+if [ -z "${BATS_TEST_FILENAME:-}" ]; then
+  main "$@"
+fi
 
 # Optional installs
 # # Ask the user if they want to install Re-volt

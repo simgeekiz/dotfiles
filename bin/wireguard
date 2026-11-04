@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+#
+# File: ~/.dotfiles/bin/wireguard
+# Control a WireGuard connection through NetworkManager
+#
+# Usage:
+#   wireguard up
+#   wireguard down
+#   wireguard status
+#
+# Author: Simge Ekiz
+# License: MIT
+
+set -euo pipefail
+
+CONNECTION="wg0"
+script_name="${0##*/}"
+
+# === Usage ===
+usage() {
+  cat <<EOF
+Usage: $script_name <command>
+
+Commands:
+  up              Activate the WireGuard connection
+  down            Deactivate the WireGuard connection
+  status          Show connection and WireGuard status
+  --help, -h      Show this help message
+
+Description:
+  Controls the WireGuard connection through NetworkManager.
+
+Configuration:
+  NetworkManager connection: $CONNECTION
+EOF
+}
+
+# === Check dependencies ===
+check_dependencies() {
+  local command
+
+  for command in nmcli wg; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+      printf '❗ Required command not found: %s\n' "$command" >&2
+      exit 1
+    fi
+  done
+}
+
+# === Check NetworkManager connection ===
+check_connection() {
+  if ! nmcli -t -f NAME connection show | grep -Fxq "$CONNECTION"; then
+    printf '❗ NetworkManager connection not found: %s\n\n' "$CONNECTION" >&2
+    echo "Available connections:" >&2
+    nmcli -f NAME,TYPE connection show >&2
+    exit 1
+  fi
+}
+
+# === Bring connection up ===
+connection_up() {
+  echo "Activating WireGuard connection: $CONNECTION"
+  nmcli connection up "$CONNECTION"
+}
+
+# === Bring connection down ===
+connection_down() {
+  echo "Deactivating WireGuard connection: $CONNECTION"
+
+  if nmcli -t -f NAME connection show --active | grep -Fxq "$CONNECTION"; then
+    nmcli connection down "$CONNECTION"
+  else
+    echo "Connection is already inactive."
+  fi
+}
+
+# === Show status ===
+connection_status() {
+  echo "=== NetworkManager connection ==="
+
+  if nmcli -t -f NAME connection show --active | grep -Fxq "$CONNECTION"; then
+    echo "Status: active"
+  else
+    echo "Status: inactive"
+  fi
+
+  echo
+  echo "=== WireGuard status ==="
+
+  if sudo wg show "$CONNECTION" 2>/dev/null; then
+    :
+  else
+    echo "WireGuard interface is not active."
+  fi
+}
+
+# === Parse arguments ===
+parse_args() {
+  if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+  fi
+
+  case "$1" in
+    up)
+      [[ $# -eq 1 ]] || {
+        echo "❗ The 'up' command does not accept additional arguments." >&2
+        exit 1
+      }
+      connection_up
+      ;;
+
+    down)
+      [[ $# -eq 1 ]] || {
+        echo "❗ The 'down' command does not accept additional arguments." >&2
+        exit 1
+      }
+      connection_down
+      ;;
+
+    status)
+      [[ $# -eq 1 ]] || {
+        echo "❗ The 'status' command does not accept additional arguments." >&2
+        exit 1
+      }
+      connection_status
+      ;;
+
+    -h|--help)
+      usage
+      ;;
+
+    *)
+      printf '❗ Unknown command: %s\n\n' "$1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+# === Main ===
+main() {
+  check_dependencies
+  check_connection
+  parse_args "$@"
+}
+
+# Only skip main() when this file is sourced by a Bats test
+# (BATS_TEST_FILENAME is set automatically by the Bats test framework);
+# this lets tests load this script's functions without running the real
+# program. In every other context -- direct execution, or being sourced
+# on purpose by another bootstrap script (e.g. setup.sh sourcing this
+# file to reuse its main()) -- main() still runs exactly as before.
+if [ -z "${BATS_TEST_FILENAME:-}" ]; then
+  main "$@"
+fi

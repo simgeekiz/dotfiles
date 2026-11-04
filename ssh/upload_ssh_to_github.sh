@@ -50,6 +50,27 @@ print_existing_ssh_key() {
   return 1
 }
 
+# 📤 Function to upload a public key to GitHub via `gh`, handling the
+# "already in use" case separately from a genuine failure.
+# Pulled out of main() so it can be unit-tested on its own.
+upload_key_to_github() {
+  pubkey=$1
+  key_title=$2
+  gh_output_log="${GH_OUTPUT_LOG:-/tmp/gh_output}"
+
+  gh_output=$(gh ssh-key add "$pubkey" --title "$key_title" 2>&1)
+  gh_exit=$?
+  printf '%s\n' "$gh_output" > "$gh_output_log"
+
+  if [ "$gh_exit" -eq 0 ]; then
+    echo "🔑 SSH key uploaded to GitHub with title: $key_title"
+  elif printf '%s\n' "$gh_output" | grep -q "key is already in use"; then
+    echo "⚠️  SSH key is already in use on GitHub. Skipping upload."
+  else
+    echo "⚠️  Failed to upload SSH key: $gh_output"
+  fi
+}
+
 # 🛠 Function to install/check GitHub CLI
 check_GitHub_CLI() {
   # Checks for GitHub CLI (gh).
@@ -120,14 +141,8 @@ main() {
       gh auth login
     fi
 
-    gh ssh-key add "$PUBKEY" --title "$KEY_TITLE" || \
-      echo "⚠️ Key may already exist."
-
-    if gh ssh-key add "$PUBKEY" --title "$KEY_TITLE" 2>&1 | tee /tmp/gh_output.printf '%s\n' | grep -q "key is already in use"; then
-      echo "⚠️  SSH key is already in use on GitHub. Skipping upload."
-    else
-      echo "🔑 SSH key uploaded to GitHub with title: $KEY_TITLE"
-    fi
+    # Single upload attempt; capture output once so we don't hit the API twice.
+    upload_key_to_github "$PUBKEY" "$KEY_TITLE"
   else
     echo "ℹ️ gh not found, falling back to manual setup."
     echo "👉 Copy this key and add it to GitHub:"
@@ -140,4 +155,11 @@ main() {
   fi
 }
 
-main "$@"
+# Only run main() when this script is executed directly (e.g. `sh upload_ssh_to_github.sh`).
+# When it is instead sourced (e.g. `. upload_ssh_to_github.sh` from a test file),
+# $0 holds the parent shell's name instead of this script's filename, so
+# main() is skipped and tests can call individual functions above without
+# triggering the real interactive flow.
+case "${0##*/}" in
+  upload_ssh_to_github.sh) main "$@" ;;
+esac

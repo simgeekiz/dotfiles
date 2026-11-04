@@ -56,6 +56,7 @@ done
 source_if_exists "$HOME/.dotfiles/zsh/zsh_aliases.zsh"
 source_if_exists "$HOME/.dotfiles/tmux/tmux_aliases.sh"
 source_if_exists "$HOME/.dotfiles/git/git_aliases.sh"
+source_if_exists "$HOME/.dotfiles/onedrive/onedrive_aliases.sh"
 
 ### === Load Key Bindings
 source_if_exists "$HOME/.dotfiles/zsh/key-bindings.zsh"

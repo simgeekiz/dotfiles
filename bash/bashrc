@@ -48,6 +48,7 @@ done
 source_if_exists "$HOME/.dotfiles/bash/bash_aliases.sh"
 source_if_exists "$HOME/.dotfiles/tmux/tmux_aliases.sh"
 source_if_exists "$HOME/.dotfiles/git/git_aliases.sh"
+source_if_exists "$HOME/.dotfiles/onedrive/onedrive_aliases.sh"
 
 # === Completion ===
 source_if_exists "$HOME/.dotfiles/bash/completion.sh"
